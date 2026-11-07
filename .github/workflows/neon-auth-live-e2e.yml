@@ -1,0 +1,26 @@
+name: Rahavahti real Neon Auth E2E (HOLD)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-auth-isolation:
+    runs-on: ubuntu-latest
+    environment: rahavahti-qa
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify configured isolated preview and live two-user sessions
+        env:
+          RAHAVAHTI_QA_BASE_URL: ${{ secrets.RAHAVAHTI_QA_BASE_URL }}
+          RAHAVAHTI_QA_USER_A_EMAIL: ${{ secrets.RAHAVAHTI_QA_USER_A_EMAIL }}
+          RAHAVAHTI_QA_USER_A_PASSWORD: ${{ secrets.RAHAVAHTI_QA_USER_A_PASSWORD }}
+          RAHAVAHTI_QA_USER_B_EMAIL: ${{ secrets.RAHAVAHTI_QA_USER_B_EMAIL }}
+          RAHAVAHTI_QA_USER_B_PASSWORD: ${{ secrets.RAHAVAHTI_QA_USER_B_PASSWORD }}
+          RAHAVAHTI_QA_USER_A_ACCOUNT_ID: ${{ secrets.RAHAVAHTI_QA_USER_A_ACCOUNT_ID }}
+          RAHAVAHTI_QA_USER_B_ACCOUNT_ID: ${{ secrets.RAHAVAHTI_QA_USER_B_ACCOUNT_ID }}
+        run: node scripts/verify-neon-auth-live-e2e.mjs
