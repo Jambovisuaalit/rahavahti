@@ -38,7 +38,7 @@ export default function LoanComparisonPage(){
    <p className="muted">Luoton avausmaksu ja tilinhoitomaksut vaikuttavat todelliseen vuosikorkoon, mutta niitä arvioidaan lainmukaisuutta varten erillisen kulukaton perusteella. Korkokattoa ei verrata todelliseen vuosikorkoon.</p>
    <label className="duplicate-option"><input type="checkbox" checked={forceUnsupported} onChange={e=>setForceUnsupported(e.target.checked)}/> Tarkasteltava sopimus on vanha tai erityinen luottotyyppi – älä tee lakirajapäätelmää.</label>
    <p className="muted">Malli olettaa yhden noston, kiinteän nimelliskoron, kuukausittaisen tasalyhennys-/annuiteettiaikataulun, avausmaksun nostopäivänä ja kuukausittaisen tilinhoitomaksun. Ei sovellu suoraan jatkuvaan luottoon, asuntoluottoon, muuttuviin korkoihin tai sopimuskohtaisiin poikkeuksiin.</p>
-   <p className="muted">Lähteet: <a href="https://finlex.fi/fi/lainsaadanto/saadoskokoelma/2023/449" target="_blank" rel="noopener noreferrer">KSL 7:17 a §</a> · <a href="https://www.suomenpankki.fi/fi/ajankohtaista/lehdistotiedotteet-ja-uutiset/tiedotteet/2026/korkolain-mukainen-viitekorko-ja-viivastyskorot-1.7.31.12.2026/" target="_blank" rel="noopener noreferrer">Suomen Pankki 1.7.–31.12.2026</a> · <a href="https://www.kkv.fi/kuluttaja-asiat/tietoa-ja-ohjeita-yrityksille/kuluttaja-asiamiehen-linjaukset/kuluttajaluottojen-tarjoaminen/" target="_blank" rel="noopener noreferrer">KKV: luottokustannukset</a>.</p>
+   <p className="muted">Lähteet: <a href="https://www.finlex.fi/fi/lainsaadanto/1978/38" target="_blank" rel="noopener noreferrer">KSL 7:17 a §</a> · <a href="https://www.suomenpankki.fi/fi/ajankohtaista/lehdistotiedotteet-ja-uutiset/tiedotteet/2026/korkolain-mukainen-viitekorko-ja-viivastyskorot-1.7.31.12.2026/" target="_blank" rel="noopener noreferrer">Suomen Pankki 1.7.–31.12.2026</a> · <a href="https://www.kkv.fi/kuluttaja-asiat/tietoa-ja-ohjeita-yrityksille/kuluttaja-asiamiehen-linjaukset/kuluttajaluottojen-tarjoaminen/" target="_blank" rel="noopener noreferrer">KKV: luottokustannukset</a> · <a href="https://finlex.fi/fi/lainsaadanto/2016/1123" target="_blank" rel="noopener noreferrer">OM:n asetus 1123/2016, APR</a>.</p>
   </section>
   <div className="grid" style={{marginTop:22}}>
    {offers.map((offer,i)=>{
@@ -81,7 +81,7 @@ export default function LoanComparisonPage(){
     {offers[0].amountEuro!==offers[1].amountEuro||offers[0].months!==offers[1].months?<p className="info">Tarjouksilla on eri pääoma tai laina-aika. Kokonaiskulujen eurovertailu ei kerro yksin edullisuudesta.</p>:<p>Kokonaiskulujen ero: <b>{money(Math.abs(ranked[1].totalCostsCents-ranked[0].totalCostsCents))}</b>.</p>}
    </div>:<p className="muted">Täytä molemmat tarjoukset kelvollisilla synteettisillä arvoilla.</p>}
    <button type="button" onClick={reset}>Palauta synteettiset esimerkit</button>
-   <p className="muted">Käytössä on päivien määrään perustuva kassavirtojen diskonttaus (365 päivän vuosipohja) ja kuukausittain senttiin pyöristetty annuiteettimalli. Laskenta ei kata lain edellyttämiä kaikkia poikkeusoletuksia, joten lakitestien tulos on alustava.</p>
+   <p className="muted">Käytössä on 12 yhtä pitkään kuukausijaksoon vuodessa perustuva kassavirtojen diskonttaus (asetus 1123/2016, liite I) ja kuukausittain senttiin pyöristetty annuiteettimalli. Laskenta ei kata lain edellyttämiä kaikkia poikkeusoletuksia, joten lakitestien tulos on alustava.</p>
    <p><Link href="/luotonantajat">Luotonantajahakemisto</Link></p>
   </section>
  </main>;
