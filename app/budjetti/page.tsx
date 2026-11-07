@@ -1,6 +1,9 @@
 'use client';
 import {useMemo,useState,type ChangeEvent} from 'react';
 import {DEMO_LIMITS,DEMO_MONTH,DEMO_TRANSACTIONS,budgetSummary,euro,fiDate,type SampleTransaction} from '../../lib/demo-budget';
+import {BANK_EXPORTS} from '../../lib/bank-exports';
+// @ts-ignore -- CommonJS-compatible JS module tested separately.
+import {duplicateCandidates,acceptedRowsAfterReview} from '../../lib/transaction-duplicates.mjs';
 // @ts-ignore -- adapter is JS and covered with Node / Playwright tests.
 import {parseBudgetCSV,suggestedMapping,validateBudgetRows,budgetMonths,classifyBudgetRows} from '../../lib/budget-csv.mjs';
 
