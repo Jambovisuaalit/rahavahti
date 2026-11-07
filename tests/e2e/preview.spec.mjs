@@ -98,8 +98,19 @@ test("Neon Auth A/B isolation, atomic CSV, replay, rollback",async()=>{
    expect((await (await a.context.request.get("/api/transactions?accountId="+accountA)).json()).transactions).toHaveLength(2);
 
    await a.page.getByRole("button",{name:"Kirjaudu ulos"}).click();
+   await expect(a.page).toHaveURL(/\/auth\/sign-in/);
    const afterLogout=await a.context.request.get("/api/accounts",{maxRedirects:0});
    expect(afterLogout.status()).not.toBe(200);
+   await a.page.getByLabel("Sähköposti").fill(a.email);
+   await a.page.getByLabel("Salasana").fill("not-the-correct-password");
+   await a.page.getByRole("button",{name:"Kirjaudu",exact:true}).click();
+   await expect(a.page.getByRole("alert")).not.toBeEmpty();
+   await a.page.getByLabel("Salasana").fill(password);
+   await a.page.getByRole("button",{name:"Kirjaudu",exact:true}).click();
+   await expect(a.page).toHaveURL(/\/dashboard(?:\/)?$/,{timeout:20000});
+   await a.page.reload();
+   await expect(a.page.getByRole("heading",{name:"Rahavahti"})).toBeVisible();
+   expect((await (await a.context.request.get("/api/transactions?accountId="+accountA)).json()).transactions).toHaveLength(2);
    await a.context.close();await b.context.close();
  }finally{await browser.close()}
 });
