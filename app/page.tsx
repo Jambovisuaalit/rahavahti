@@ -26,7 +26,7 @@ export default function Home(){
    return purchaseAudit({balanceCents:b,bufferCents:buf,horizonStart:start,horizonDays:30,flows:[{date:day(5),cents:i},{date:day(10),cents:-ex}],purchaseFlows:[{date:start,cents:-p}]});
   }catch(err){return {tier:'EI_ARVIOITAVISSA',reason:txt(err)}}
  },[balance,buffer,price,income,expense,start]);
- return <><main>
+ return <><main id="main-content">
   <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><p><a href="/luotonantajat">Luotonantajahakemisto ja luottotietojen testituonti →</a></p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
   <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
   <div className="grid" style={{marginTop:24}}>
