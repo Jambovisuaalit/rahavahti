@@ -69,5 +69,6 @@ export default function Home(){
     <div><label htmlFor="start">Aloituspäivä</label><input id="start" type="date" value={start} onChange={e=>setStart(e.target.value)}/></div>
   </div><div className="summary"><span className="muted">30 päivän pienin ennustettu saldo</span><div className="stat">{audit.tier==='EI_ARVIOITAVISSA'?'Ei arvioitavissa':euro(audit.minProjectedBalanceCents)}</div><b>{audit.tier.replaceAll('_',' ')}</b>{audit.reason&&<p>{audit.reason}</p>}</div></section>
   </div><section className="card" style={{marginTop:24}}><h2>Julkaisuportit</h2><p>G0 Määrittely · G1 Auth/RLS <b>HOLD</b> · G2 Tallentava CSV <b>HOLD</b> · G3 Laskentatestaus <b>KESKEN</b> · G4 Viranomaisdata <b>HOLD</b> · G5 Tuotanto <b>HOLD</b></p></section>
+ <section className="card" style={{marginTop:24}}><h2>Suomen Pankin korkovertailu</h2><p>Vertaa kulutusluottosi korkoa tilastolliseen keskiarvoon. Testisummia ei tallenneta.</p><a href="/korkovertailu">Avaa korkovertailu</a></section>
  </main></>;
 }
