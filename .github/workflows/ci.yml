@@ -1,13 +1,28 @@
 name: Rahavahti CI
 on:
   push:
-    branches: [main]
+    branches: [main, feat/creditor-directory-local-import]
   pull_request:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-ci-password
+          POSTGRES_DB: rahavahti_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d rahavahti_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,11 +32,19 @@ jobs:
           cache-dependency-path: package.json
       - name: Install
         run: npm install --no-audit --no-fund
+      - name: Audit production dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
       - name: Test reference core
         run: npm test
+      - name: Two-user Postgres RLS isolation (synthetic only)
+        run: docker run --rm --network host -e PGPASSWORD=synthetic-ci-password -v "$PWD:/work" -w /work postgres:16 psql -h 127.0.0.1 -U postgres -d rahavahti_ci -f tests/sql/rls-two-users.sql
       - name: Production build validation (not deployment)
         env:
           NEON_AUTH_BASE_URL: https://ci.example.invalid/rahavahti/auth
           NEON_AUTH_COOKIE_SECRET: ci-only-synthetic-secret-never-for-production-0000
           FINANCE_WRITES_ENABLED: 'false'
         run: npm run build
+      - name: Install headless Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser security E2E (synthetic data only)
+        run: npm run test:e2e
