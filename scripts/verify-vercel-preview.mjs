@@ -14,6 +14,9 @@ const ORIGIN = "https://rahavahti-preview-pt0koazv4-info-32533854s-projects.verc
 const COMMIT = "3f9d52219504b57be68e75f11796d0357ec6c5a5";
 const MARKER = "__RAHAVAHTI_HTTP_STATUS__:";
 const BASE = new URL(ORIGIN);
+// Match numeric months using regex literals (single backslashes, unlike string patterns).
+assert.match("2026-09", /^\d{4}-\d{2}$/);
+assert.match("2026M09", /^\d{4}M(?:0[1-9]|1[0-2])$/);
 assert.equal(BASE.protocol, "https:");
 assert.equal(BASE.pathname, "/");
 assert.equal(BASE.search, "");
@@ -76,7 +79,7 @@ for (const [id, metric] of [["consumer_nominal", "nominal"], ["consumer_apr", "a
   assert.equal(item.debtType, "consumer_loan");
   assert.equal(item.status, "verified_live_api");
   assert.ok(Number.isFinite(item.annualRatePercent) && item.annualRatePercent >= 0 && item.annualRatePercent < 100);
-  assert.match(item.observationMonth, /^\\d{4}-\\d{2}$/);
+  assert.match(item.observationMonth, /^\d{4}-\d{2}$/);
 }
 console.log("PASS /api/public-data/interest — HTTP 200, MFI_PUBL, live JSON");
 console.log(JSON.stringify({ nominal: byId.consumer_nominal.annualRatePercent, apr: byId.consumer_apr.annualRatePercent, month: byId.consumer_nominal.observationMonth }));
@@ -87,7 +90,7 @@ assert.equal(inflation.observation?.table, "15b5");
 assert.equal(inflation.observation?.source, "Tilastokeskus");
 assert.equal(inflation.observation?.baseYear, 2025);
 assert.equal(inflation.observation?.status, "verified_live_api");
-assert.match(inflation.observation?.observationMonth, /^\\d{4}M(?:0[1-9]|1[0-2])$/);
+assert.match(inflation.observation?.observationMonth, /^\d{4}M(?:0[1-9]|1[0-2])$/);
 for (const field of ["index", "annualChangePercent", "monthlyChangePercent"]) {
   assert.ok(Number.isFinite(inflation.observation?.[field]), `KHI: ${field} virheellinen`);
 }
