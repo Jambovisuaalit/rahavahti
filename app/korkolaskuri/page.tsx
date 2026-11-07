@@ -65,7 +65,8 @@ export default function LoanComparisonPage(){
        <div><span>Takaisinmaksu yhteensä</span><strong>{money(found.result.totalRepayCents)}</strong></div>
       </div>
       <div className="loan-legal">
-       <b>Korkokatto: {stateText(found.legality.rateStatus)}</b>
+       {found.legality.status==='REVIEW_REQUIRED'&&<b>Jatkokauden korkokatto: TARKISTETTAVA</b>}
+       <b>Alkujakson korkokatto: {stateText(found.legality.rateStatus)}</b>
        <span>Muut luottokustannukset: {stateText(found.legality.feeStatus)}</span>
        <small>{found.legality.status==='EXCEEDS'?'Alustava rajanylitys – tarkistettava sopimus ja sääntelyn soveltuvuus':found.legality.reason}</small>
       </div>
