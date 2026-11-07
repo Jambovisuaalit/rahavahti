@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
-// @ts-ignore: JavaScript core validated separately by node tests.
+// @ts-ignore -- CommonJS-free JS module tested by node tests.
 import { BENCHMARKS } from "../../../../lib/market/interest-benchmark.mjs";
+// @ts-ignore -- JS live adapter tested by node tests.
+import { fetchLiveBenchmarks } from "../../../../lib/market/bof-live.mjs";
 export const runtime = "nodejs";
 export async function GET() {
-  return NextResponse.json({
-    source: "Suomen Pankki / Finanssivalvonta",
-    dataset: "MFI_PUBL",
-    apiVersion: "Timeseries API v4 (live retrieval not yet verified)",
-    dataMode: "static_verified_snapshot",
-    observations: Object.values(BENCHMARKS),
-    liveIntegrationStatus: "HOLD_SERIES_ID_UNVERIFIED",
-    disclaimer: "Nämä ovat syyskuun 2026 julkaistuja havaintoja, eivät reaaliaikaisia korkoja.",
-  }, { headers: { "Cache-Control": "public, max-age=300, s-maxage=86400" } });
+  try {
+    const live=await fetchLiveBenchmarks();
+    return NextResponse.json({
+      source:"Suomen Pankki / Finanssivalvonta",dataset:"MFI_PUBL",
+      dataMode:"live_api_verified",observations:Object.values(live),
+      disclaimer:"Tilastollisia uusien sopimusten korkoja, ei lainatarjouksia."
+    },{headers:{"Cache-Control":"public,max-age=300,s-maxage=3600"}});
+  } catch {
+    // Fail closed: explicitly label the pinned fallback snapshot, never call it live.
+    return NextResponse.json({
+      source:"Suomen Pankki / Finanssivalvonta",dataset:"MFI_PUBL",
+      dataMode:"static_fallback",liveIntegrationStatus:"LIVE_UNAVAILABLE",
+      observations:Object.values(BENCHMARKS),
+      disclaimer:"Live-data ei ole nyt saatavilla. Näytetään vain syyskuun 2026 erikseen merkitty vertailutilasto."
+    },{headers:{"Cache-Control":"no-store","X-Interest-Data-Status":"fallback"}});
+  }
 }
