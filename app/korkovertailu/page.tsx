@@ -30,7 +30,7 @@ export default function KorkovertailuPage() {
       </select>
       <label htmlFor="my-rate">Oman kulutusluoton {metric==="nominal"?"sopimuskorko":"todellinen vuosikorko"} (%)</label>
       <input id="my-rate" value={rate} onChange={e=>setRate(e.target.value)} inputMode="decimal" style={{padding:12}}/>
-      <label htmlFor="my-balance">Jäljellä oleva lainasaldo (€) — vapaaehtoinen havainnollistava laskelma</label>
+      <label htmlFor="my-balance">Jäljellä oleva lainasaldo (€) — havainnollistavaa laskelmaa varten</label>
       <input id="my-balance" value={balance} onChange={e=>setBalance(e.target.value)} inputMode="decimal" style={{padding:12}}/>
       {result.error ? <p role="alert">{result.error}</p> : result.data && <>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:16}}>
