@@ -6,7 +6,7 @@
 import { request } from '@playwright/test';
 
 const needed=[
- 'RAHAVAHTI_QA_BASE_URL',
+ 'RAHAVAHTI_QA_BASE_URL','RAHAVAHTI_QA_DEPLOYMENT_ID','VERCEL_TOKEN','GITHUB_SHA',
  'RAHAVAHTI_QA_USER_A_EMAIL','RAHAVAHTI_QA_USER_A_PASSWORD',
  'RAHAVAHTI_QA_USER_B_EMAIL','RAHAVAHTI_QA_USER_B_PASSWORD',
  'RAHAVAHTI_QA_USER_A_ACCOUNT_ID','RAHAVAHTI_QA_USER_B_ACCOUNT_ID',
@@ -16,6 +16,28 @@ if(missing.length)throw Error('QA credentials / fixtures not configured: '+missi
 const base=process.env.RAHAVAHTI_QA_BASE_URL.replace(/\/+$/,'');
 if(!base.startsWith('https://'))throw Error('QA endpoint must use HTTPS');
 if(/localhost|127\.0\.0\.1|\.invalid/.test(base))throw Error('QA endpoint must be a real, isolated preview');
+// Fail closed before sending any credentials. Vercel identifies Preview with
+// target=null: a deployment reported as production/staging is never acceptable.
+const deploymentId=process.env.RAHAVAHTI_QA_DEPLOYMENT_ID;
+if(!/^dpl_[A-Za-z0-9]+$/.test(deploymentId))throw Error('Invalid Vercel deployment ID');
+const projectId='prj_V62Qmsp2qKO8feF2ZIXQFDUmEJDL';
+const teamId='team_zwsvoePoiBeskRuyl2Iar883';
+const metadataResponse=await fetch('https://api.vercel.com/v13/deployments/'+encodeURIComponent(deploymentId)+'?teamId='+encodeURIComponent(teamId),{
+ headers:{Authorization:'Bearer '+process.env.VERCEL_TOKEN,Accept:'application/json'},
+ signal:AbortSignal.timeout(15000)
+});
+if(!metadataResponse.ok)throw Error('Vercel preview metadata unavailable: HTTP '+metadataResponse.status);
+const deployment=await metadataResponse.json();
+const target=deployment.target??null;
+const actualProjectId=deployment.projectId??deployment.project?.id;
+const actualSha=deployment.meta?.githubCommitSha??deployment.gitSource?.sha;
+if(target!==null)throw Error('HOLD: Vercel deployment is not Preview');
+if(deployment.readyState!=='READY')throw Error('HOLD: Vercel preview is not READY');
+if(actualProjectId!==projectId)throw Error('HOLD: deployment belongs to another Vercel project');
+if(actualSha!==process.env.GITHUB_SHA)throw Error('HOLD: deployment commit does not match reviewed workflow commit');
+if(new URL(base).hostname!==deployment.url)throw Error('HOLD: QA URL is not the verified commit deployment');
+console.log('PASS: Vercel Preview target, QA project, READY state and exact commit verified');
+
 const QA_A={
   email:process.env.RAHAVAHTI_QA_USER_A_EMAIL,
   password:process.env.RAHAVAHTI_QA_USER_A_PASSWORD,
