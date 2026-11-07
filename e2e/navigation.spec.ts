@@ -25,7 +25,7 @@ test('mobile navigation opens and closes menu and preserves HOLD',async({page})=
  await menu.click();
  await expect(menu).toHaveAttribute('aria-expanded','true');
  await expect(page.getByRole('navigation',{name:'Lisävalinnat'})).toBeVisible();
- await expect(page.getByText('Raportit · HOLD')).toBeVisible();
+ await expect(page.getByRole('navigation',{name:'Lisävalinnat'}).getByText('Raportit · HOLD')).toBeVisible();
  await menu.click();
  await expect(menu).toHaveAttribute('aria-expanded','false');
  await expect(page.getByRole('navigation',{name:'Lisävalinnat'})).toHaveCount(0);
