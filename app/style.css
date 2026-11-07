@@ -41,3 +41,8 @@
 .debt-choice b{font-size:14px}.debt-choice span:last-child{font-weight:700}
 @media(max-width:1250px){.debt-loan-grid{grid-template-columns:1fr 1fr}.debt-plan-grid{grid-template-columns:1fr}}
 @media(max-width:767px){.debt-loan-grid{grid-template-columns:1fr}.debt-plan-grid{grid-template-columns:1fr}.debt-choice{min-height:0}}
+
+/* Keep native date/number inputs and compact debt KPI cards within 320px screens. */
+#startMonth,.debt-loan-grid input,.debt-plan-grid button,.card .fields input{min-width:0;max-width:100%}
+.debt-loan-grid,.debt-loan-card,.debt-plan-grid,.debt-choice{min-width:0;max-width:100%}
+@media(max-width:360px){.debt-choice{padding:12px}.metric-grid .metric{min-width:0}.card .fields>div{min-width:0}}
