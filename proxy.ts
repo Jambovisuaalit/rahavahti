@@ -3,7 +3,7 @@ import { auth } from "./lib/auth/server";
 
 /** Next.js 16: one proxy composes Neon Auth and per-request CSP. */
 const authProxy = auth.middleware({ loginUrl: "/auth/sign-in" });
-const PUBLIC_PAGES = new Set(["/", "/luotonantajat", "/korkovertailu", "/inflaatio"]);
+const PUBLIC_PAGES = new Set(["/", "/luotonantajat", "/korkovertailu", "/inflaatio", "/budjetti", "/korkolaskuri"]);
 
 export default async function proxy(request: NextRequest) {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
