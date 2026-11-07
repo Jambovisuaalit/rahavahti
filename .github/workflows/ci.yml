@@ -32,8 +32,6 @@ jobs:
           cache-dependency-path: package.json
       - name: Install
         run: npm install --no-audit --no-fund
-      - name: Audit production dependency vulnerabilities
-        run: npm audit --omit=dev --audit-level=high
       - name: Test reference core
         run: npm test
       - name: Two-user Postgres RLS isolation (synthetic only)
@@ -48,3 +46,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser security E2E (synthetic data only)
         run: npm run test:e2e
+      - name: Audit production dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
