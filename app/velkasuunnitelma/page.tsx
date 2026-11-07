@@ -9,7 +9,7 @@ const EXAMPLE:Finance={netIncomeEuro:2400,fixedExpensesEuro:1400,cashEuro:800,bu
  loans:[{id:'a',label:'Demo A',balanceEuro:1800,nominalPct:16,minimumEuro:90,monthlyFeeEuro:3},
  {id:'b',label:'Demo B',balanceEuro:5500,nominalPct:7,minimumEuro:150,monthlyFeeEuro:2},
  {id:'c',label:'Demo C',balanceEuro:500,nominalPct:9,minimumEuro:40,monthlyFeeEuro:0}]};
-const euro=(c:number)=>new Intl.NumberFormat('fi-FI',{style:'currency',currency:'EUR'}).format(c/100);
+const euro=(c:number|null|undefined)=>typeof c==='number'&&Number.isFinite(c)?new Intl.NumberFormat('fi-FI',{style:'currency',currency:'EUR'}).format(c/100):'Ei laskettavissa';
 const names:Record<string,string>={minimum:'Nykytila – vähimmäismaksut',avalanche:'Vyörytys – korkein korko ensin',snowball:'Lumipallo – pienin velka ensin'};
 const debtFields=[['balanceEuro','Jäljellä oleva pääoma (€)'],['nominalPct','Nimelliskorko (%)'],['minimumEuro','Vähimmäismaksu (€/kk)'],['monthlyFeeEuro','Tilinhoito (€/kk)']] as const;
 const mainFields=[['netIncomeEuro','Nettotulot (€/kk)'],['fixedExpensesEuro','Kiinteät elinkustannukset (€/kk)'],['cashEuro','Tilivarat (€)'],['bufferEuro','Puskurin turvaraja (€)']] as const;
