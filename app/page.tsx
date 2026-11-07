@@ -27,7 +27,7 @@ export default function Home(){
   }catch(err){return {tier:'EI_ARVIOITAVISSA',reason:txt(err)}}
  },[balance,buffer,price,income,expense,start]);
  return <><header><strong>Rahavahti</strong><span className="pill">KEHITYSESikatselu · HOLD</span></header><main>
-  <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
+  <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><p><a href="/luotonantajat">Luotonantajahakemisto ja luottotietojen testituonti →</a></p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
   <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
   <div className="grid" style={{marginTop:24}}>
   <section className="card"><h2>1. CSV-tuonnin esikatselu</h2><label htmlFor="csv">Valitse testitiedosto (CSV, enintään 10 Mt)</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" onChange={importFile}/>
