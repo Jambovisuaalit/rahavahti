@@ -28,9 +28,9 @@ Päiväys 07.11.2026 · **HOLD** · Ei oikeiden luottotietojen käsittelyä.
 ## Lakitestin rajaus
 
 - Lähtötilanne: 01.07.–31.12.2026 solmittu, tavanomainen KSL 7 luvun 17 a §:n soveltamisalaan kuuluva uusi kuluttajaluotto.
-- Nimelliskorko <= 17,5 %: läpäisee **vain nimelliskorkorajan alustavan seulonnan**.
+- Nimelliskorko <= 17,5 %: läpäisee **vain 1.7.–31.12.2026 alkujakson nimelliskorkorajan alustavan seulonnan**. Jos takaisinmaksu jatkuu viitekorkokauden ulkopuolelle, kokonaisstatus on **REVIEW_REQUIRED** ja jatkokauden korkokatto tulee arvioida erikseen.
 - Kulurajat: tarkistetaan laskennallisten muiden kulujen koko laina-ajan päiväkohtainen katto sekä kunkin 12 kk jakson 150 €:n katto. Tämä on **konservatiivinen alustava arvio**, ei lopullinen sopimusoikeudellinen vahvistus.
-- Koko sopimuksen lainmukaisuutta ei saa merkitä varmistetuksi pelkän laskurin läpäisyn perusteella. Lakitestin tulokset ovat PRELIMINARY_PASS, EXCEEDS tai NOT_ASSESSED.
+- Koko sopimuksen lainmukaisuutta ei saa merkitä varmistetuksi pelkän laskurin läpäisyn perusteella. Lakitestin tulokset ovat PRELIMINARY_PASS, REVIEW_REQUIRED, EXCEEDS tai NOT_ASSESSED.
 
 ## Tuotantoportit
 
@@ -50,3 +50,7 @@ Erillisellä Python/SciPy brentq -menetelmällä laskettu kassavirtojen NPV-yht�
 | 2 000 €, 0 % nimelliskorko, 12 kk, ei muita kuluja | 0 % | 0 € |
 
 Pankin todellisen sopimusehtojen ilmoittaman vuosikoron tarkistus on edelleen erillinen hyväksyntäportti. Asetuksen muut oletukset ja erikoistilanteet eivät ole vielä toteutettu.
+
+## Kehityshaaran testausstatus 07.11.2026
+
+V8-isolaattorin erillinen JS-suoritus: 18/18 laskentatestiä PASS (yksi Node-tiedostotarkistus ei kuulu tähän ajotapaan). SciPy:n riippumaton NPV-ratkaisu on antanut samoille synteettisille 12-kuukauden aikajakson esimerkeille samat referenssiarvot. **Täydellisiä GitHub Actions -ajotuloksia ei ole vielä vahvistettu uusimmalle lähdekoodille.** PR #1 pysyy luonnoksena ja tuotanto HOLD.
