@@ -14,7 +14,7 @@ export default function CreditorsPage(){
   finally{e.target.value=''}
  }
  return <><main id="main-content">
- <a href="/">← Etusivu</a><h1>Luotonantajat ja omien luottotietojen tuonti</h1>
+ <a href="/">← Etusivu</a><p><a href="/korkolaskuri">Vertaile synteettisten lainojen kokonaiskuluja ja todellista vuosikorkoa →</a></p><h1>Luotonantajat ja omien luottotietojen tuonti</h1>
  <div className="info"><b>HOLD – vain synteettinen testidata.</b> Tiedosto luetaan selaimen muistissa. Tietoja ei lähetetä eikä tallenneta palvelimelle. Älä lataa aitoja henkilökohtaisia luottotietoja. Viralliseen luottotietorekisteriin ei ole yhteyttä.</div>
  <div className="grid" style={{marginTop:24}}>
  <section className="card"><h2>Luotonantajahakemisto ({CREDITORS.length})</h2><p className="muted">Käyttäjän ilmoittama luettelo. Ajantasainen osallistuminen ja oikeudelliset tunnisteet vahvistamatta.</p>
