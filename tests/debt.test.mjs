@@ -21,4 +21,4 @@ test("strategies prioritize high rate and small balance respectively",()=>{const
 test("consolidation calculates euro cost delta",()=>{const x=consolidation({debts,newOffer:{principalCents:150000,nominalAnnualPct:5,months:12},monthlyBudgetCents:18000});assert.equal(x.status,"VERTAILTU");assert.ok(Number.isInteger(x.savingsCents))});
 test("consolidation principal must cover old debts",()=>assert.throws(()=>consolidation({debts,newOffer:{principalCents:140000,nominalAnnualPct:5,months:12},monthlyBudgetCents:18000}),/katettava/));
 test("negative fees rejected",()=>assert.throws(()=>amortization({...b,monthlyFeeCents:-1}),/ei kelpaa/));
-test("duplicate debt IDs rejected",()=>assert.throws(()=>repaymentPlan([debts[0],debts[0]],{monthlyBudgetCents:18000}),/ei kelpaa/));
+test("duplicate debt IDs rejected",()=>assert.throws(()=>repaymentPlan([debts[0],debts[0]],{monthlyBudgetCents:18000}),/tiedot eivät kelpaa/));
