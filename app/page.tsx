@@ -26,11 +26,11 @@ export default function Home(){
    return purchaseAudit({balanceCents:b,bufferCents:buf,horizonStart:start,horizonDays:30,flows:[{date:day(5),cents:i},{date:day(10),cents:-ex}],purchaseFlows:[{date:start,cents:-p}]});
   }catch(err){return {tier:'EI_ARVIOITAVISSA',reason:txt(err)}}
  },[balance,buffer,price,income,expense,start]);
- return <><header><strong>Rahavahti</strong><span className="pill">KEHITYSESikatselu · HOLD</span></header><main>
+ return <><main>
   <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><p><a href="/luotonantajat">Luotonantajahakemisto ja luottotietojen testituonti →</a></p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
   <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
   <div className="grid" style={{marginTop:24}}>
-  <section className="card"><h2>1. CSV-tuonnin esikatselu</h2><label htmlFor="csv">Valitse testitiedosto (CSV, enintään 10 Mt)</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" onChange={importFile}/>
+  <section id="csv" className="card"><h2>1. CSV-tuonnin esikatselu</h2><label htmlFor="csv">Valitse testitiedosto (CSV, enintään 10 Mt)</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" onChange={importFile}/>
   {filename&&<p className="muted">{filename}</p>}{error&&<p role="alert" className="error">{error}</p>}
   {parsed&&<><p>{parsed.rows.length-1} datariviä · erotin: {JSON.stringify(parsed.delimiter)}</p>
     <div className="fields">{(['date','amount','description'] as const).map(k=><div key={k}><label>{({date:'Päivämäärä',amount:'Summa',description:'Kuvaus'} as const)[k]}</label><select value={cols[k]} onChange={e=>setCols(v=>({...v,[k]:Number(e.target.value)}))}>{parsed.rows[0].map((h,j)=><option key={j} value={j}>{h||'Sarake '+(j+1)}</option>)}</select></div>)}</div>
@@ -39,10 +39,10 @@ export default function Home(){
     <div className="tablewrap"><table><thead><tr><th>Päivä</th><th>Kuvaus</th><th>Summa</th></tr></thead><tbody>{mapped.valid.slice(0,8).map(r=><tr key={r.sourceLine}><td>{r.bookedOn.split('-').reverse().join('.')}</td><td>{r.description}</td><td>{euro(r.amountCents)}</td></tr>)}</tbody></table></div>
     <button disabled>Tallenna tapahtumat (HOLD)</button><p className="muted">Tallennus avataan vasta G1/G2-turvatestien jälkeen.</p>
   </>}</section>
-  <section className="card"><h2>2. Ostoauditointi</h2><p className="muted">Viitelaskenta. Syötä vain kuvitteellisia summia.</p><div className="fields">
+  <section id="audit" className="card"><h2>2. Ostoauditointi</h2><p className="muted">Viitelaskenta. Syötä vain kuvitteellisia summia.</p><div className="fields">
     {([{id:'balance',name:'Alkusaldo (€)',value:balance,set:setBalance},{id:'price',name:'Ostoksen hinta (€)',value:price,set:setPrice},{id:'income',name:'Tulot 5 päivän päästä (€)',value:income,set:setIncome},{id:'expense',name:'Menot 10 päivän päästä (€)',value:expense,set:setExpense},{id:'buffer',name:'Turvapuskuri (€)',value:buffer,set:setBuffer}] as const).map(f=><div key={f.id}><label htmlFor={f.id}>{f.name}</label><input id={f.id} value={f.value} onChange={e=>f.set(e.target.value)}/></div>)}
     <div><label htmlFor="start">Aloituspäivä</label><input id="start" type="date" value={start} onChange={e=>setStart(e.target.value)}/></div>
   </div><div className="summary"><span className="muted">30 päivän pienin ennustettu saldo</span><div className="stat">{audit.tier==='EI_ARVIOITAVISSA'?'Ei arvioitavissa':euro(audit.minProjectedBalanceCents)}</div><b>{audit.tier.replaceAll('_',' ')}</b>{audit.reason&&<p>{audit.reason}</p>}</div></section>
   </div><section className="card" style={{marginTop:24}}><h2>Julkaisuportit</h2><p>G0 Määrittely · G1 Auth/RLS <b>HOLD</b> · G2 Tallentava CSV <b>HOLD</b> · G3 Laskentatestaus <b>KESKEN</b> · G4 Viranomaisdata <b>HOLD</b> · G5 Tuotanto <b>HOLD</b></p></section>
- </main><footer>Rahavahti · EUR · fi-FI · Kehityskäyttö</footer></>;
+ </main></>;
 }
