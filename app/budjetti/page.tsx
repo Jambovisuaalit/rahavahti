@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useState,type ChangeEvent} from 'react';
-import {DEMO_LIMITS,DEMO_MONTH,DEMO_TRANSACTIONS,budgetSummary,euro,fiDate} from '../../lib/demo-budget';
+import {DEMO_LIMITS,DEMO_MONTH,DEMO_TRANSACTIONS,budgetSummary,euro,fiDate,type SampleTransaction} from '../../lib/demo-budget';
 // @ts-ignore -- adapter is JS and covered with Node / Playwright tests.
 import {parseBudgetCSV,suggestedMapping,validateBudgetRows,budgetMonths,classifyBudgetRows} from '../../lib/budget-csv.mjs';
 
@@ -24,7 +24,7 @@ export default function BudgetPage(){
   catch(e){return {valid:[],invalid:[],fatal:e instanceof Error?e.message:'Virheellinen sarakekartoitus'}}
  },[parsed,mapping]);
  const availableMonths=useMemo<string[]>(()=>budgetMonths(imported||[]),[imported]);
- const allTransactions=useMemo(()=>source==='csv'&&imported?classifyBudgetRows(imported,categories):[...DEMO_TRANSACTIONS],[source,imported,categories]);
+ const allTransactions=useMemo<SampleTransaction[]>(()=>source==='csv'&&imported?classifyBudgetRows(imported,categories):[...DEMO_TRANSACTIONS],[source,imported,categories]);
  const visibleTransactions=useMemo(()=>allTransactions.filter(t=>t.date.startsWith(month)),[allTransactions,month]);
  const activeLimits=useMemo(()=>source==='csv'?{...limits,Luokittelematon:0}:limits,[source,limits]);
  const summary=useMemo(()=>budgetSummary(visibleTransactions,activeLimits),[visibleTransactions,activeLimits]);
