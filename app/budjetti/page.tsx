@@ -18,12 +18,17 @@ export default function BudgetPage(){
  const [month,setMonth]=useState(DEMO_MONTH);
  const [categories,setCategories]=useState<Record<string,string>>({});
  const [imported,setImported]=useState<ImportedRow[]|null>(null);
+ const [excluded,setExcluded]=useState<number[]>([]);
+ const [duplicateReviewed,setDuplicateReviewed]=useState(false);
+ const [accountScope,setAccountScope]=useState('DEMO_ACCOUNT');
+ const [selectedBank,setSelectedBank]=useState('generic');
  const validation=useMemo<{valid:ImportedRow[];invalid:RowError[];fatal?:string}>(()=>{
   if(!parsed)return {valid:[],invalid:[]};
   try{return validateBudgetRows(parsed,mapping)}
   catch(e){return {valid:[],invalid:[],fatal:e instanceof Error?e.message:'Virheellinen sarakekartoitus'}}
  },[parsed,mapping]);
  const availableMonths=useMemo<string[]>(()=>budgetMonths(imported||[]),[imported]);
+ const duplicateMatches=useMemo<{index:number;sourceLine:number;previousIndex:number;previousLine:number;strength:string;message:string}[]>(()=>duplicateCandidates(validation.valid,{accountId:accountScope}),[validation.valid,accountScope]);
  const allTransactions=useMemo<SampleTransaction[]>(()=>source==='csv'&&imported?classifyBudgetRows(imported,categories):[...DEMO_TRANSACTIONS],[source,imported,categories]);
  const visibleTransactions=useMemo(()=>allTransactions.filter(t=>t.date.startsWith(month)),[allTransactions,month]);
  const activeLimits=useMemo(()=>source==='csv'?{...limits,Luokittelematon:0}:limits,[source,limits]);
@@ -36,7 +41,7 @@ export default function BudgetPage(){
   setLimits(current=>({...current,[category]:cents}));setError('');
  }
  async function loadCSV(event:ChangeEvent<HTMLInputElement>){
-  setFileError('');setParsed(null);setImported(null);setSource('demo');setCategories({});
+  setFileError('');setParsed(null);setImported(null);setSource('demo');setCategories({});setExcluded([]);setDuplicateReviewed(false);
   const file=event.target.files?.[0];event.target.value='';if(!file)return;
   setFilename(file.name);
   if(!file.name.toLowerCase().endsWith('.csv')||file.size>1024*1024){setFileError('Valitse enintään 1 Mt:n UTF-8 CSV-testitiedosto');return}
@@ -48,13 +53,16 @@ export default function BudgetPage(){
  }
  function applyImport(){
   if(!parsed||validation.fatal||validation.invalid.length||!validation.valid.length){setFileError('Korjaa kaikki virheet ennen budjettilaskentaa');return}
-  setImported(validation.valid);setCategories({});
+  if(duplicateMatches.length&&!duplicateReviewed){setFileError('Tarkista ensin mahdolliset kaksoiskappaleet');return}
+  const selected=acceptedRowsAfterReview(validation.valid,excluded);
+  if(!selected.length){setFileError('Tuontiin ei jää hyväksyttyjä tapahtumia');return}
+  setImported(selected);setCategories({});
   setMonth(budgetMonths(validation.valid)[0]||DEMO_MONTH);
   setSource('csv');setFileError('');
  }
  function resetDemo(){
   setSource('demo');setParsed(null);setImported(null);setCategories({});
-  setMonth(DEMO_MONTH);setFilename('');setFileError('');
+  setMonth(DEMO_MONTH);setFilename('');setFileError('');setExcluded([]);setDuplicateReviewed(false);
  }
  return <main id="main-content">
   <div className="page-eyebrow">TALOUDENHALLINTA / TESTI</div>
@@ -63,6 +71,15 @@ export default function BudgetPage(){
   <section className="card" aria-label="CSV-budjettituonti" style={{marginTop:22}}>
    <div className="section-heading"><h2>CSV-tuonti budjettiin</h2><span className="demo-tag">SYNTEETTINEN TESTI</span></div>
    <p className="muted">Yleinen UTF-8 CSV: puolipiste, pilkku tai tabulaattori. Valitse päivä, summa ja kuvaus. Negatiivinen summa = meno; positiivinen = tulo. Kulut luokitellaan aluksi luokittelemattomiksi.</p>
+   <label htmlFor="bank-export-source">Pankin vientimuoto (tietolähteen tila)</label>
+   <select id="bank-export-source" value={selectedBank} onChange={e=>setSelectedBank(e.target.value)}>
+    <option value="generic">Yleinen CSV (vain synteettinen testi)</option>
+    {BANK_EXPORTS.map(bank=><option key={bank.id} value={bank.id}>{bank.name}</option>)}
+   </select>
+   {selectedBank!=='generic'&&BANK_EXPORTS.filter(bank=>bank.id===selectedBank).map(bank=><p className="info" key={bank.id}><b>{bank.status}.</b> {bank.note} <a href={bank.source} rel="noreferrer noopener" target="_blank">Pankin lähdeohje</a>. Tämä valinta ei muuta jäsennystä eikä vahvista yhteensopivuutta.</p>}
+   <label htmlFor="account-scope">Testitilin tunniste (kaksoiskappaleiden tarkistus)</label>
+   <input id="account-scope" value={accountScope} onChange={e=>{setAccountScope(e.target.value);setDuplicateReviewed(false);setExcluded([])}} maxLength={60} placeholder="DEMO_ACCOUNT"/>
+   <p className="muted">Älä syötä oikeaa IBANia. Käytä vain kuvitteellista tilitunnistetta.</p>
    <label htmlFor="budget-csv">Valitse synteettinen CSV (enintään 1 Mt, enintään 1 000 riviä)</label>
    <input id="budget-csv" type="file" accept=".csv,text/csv" onChange={loadCSV}/>
    {filename&&<p className="muted">Tiedosto: {filename}</p>}
@@ -79,7 +96,19 @@ export default function BudgetPage(){
     <div className="tablewrap"><table><thead><tr><th>Päivä</th><th>Kuvaus</th><th>Summa</th></tr></thead><tbody>
      {validation.valid.slice(0,8).map(t=><tr key={t.id}><td>{fiDate(t.date)}</td><td>{t.description}</td><td>{euro(t.amountCents)}</td></tr>)}
     </tbody></table></div>
-    <button type="button" disabled={Boolean(validation.fatal)||validation.invalid.length>0||validation.valid.length===0} onClick={applyImport}>Käytä testitapahtumia budjetissa</button>
+    {duplicateMatches.length>0&&<div className="info" aria-label="Mahdolliset kaksoiskappaleet">
+     <b>{duplicateMatches.length} mahdollista kaksoiskappaletta</b>
+     <p>Sama päivä, summa ja kuvaus voi tarkoittaa myös kahta oikeaa erillistä tapahtumaa. Mitään ei poisteta automaattisesti. Päätä rivikohtaisesti, mitkä testirivit jätetään pois.</p>
+     {duplicateMatches.map(match=><label key={match.index} className="duplicate-option">
+      <input type="checkbox" checked={excluded.includes(match.index)} onChange={e=>{setDuplicateReviewed(false);setExcluded(prev=>e.target.checked?[...prev,match.index]:prev.filter(i=>i!==match.index))}}/>
+      Jätä pois rivi {match.sourceLine} (vastaa riviä {match.previousLine}). {match.message}
+     </label>)}
+     <label className="duplicate-option">
+      <input type="checkbox" checked={duplicateReviewed} onChange={e=>setDuplicateReviewed(e.target.checked)}/>
+      Olen tarkistanut mahdolliset kaksoiskappaleet; valitsemattomat rivit säilytetään
+     </label>
+    </div>}
+    <button type="button" disabled={Boolean(validation.fatal)||validation.invalid.length>0||validation.valid.length===0||(duplicateMatches.length>0&&!duplicateReviewed)} onClick={applyImport}>Käytä testitapahtumia budjetissa</button>
    </>}
    {source==='csv'&&<div className="info" style={{marginTop:16}}>CSV-testitapahtumat käytössä. Luokittelemattomia menoja: {visibleTransactions.filter(t=>t.category==='Luokittelematon'&&t.amountCents<0).length}. Tarkista kategoriat ennen tulkintaa.</div>}
    <button type="button" onClick={resetDemo}>Palauta esimerkkiaineisto</button>
