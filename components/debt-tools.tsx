@@ -18,11 +18,12 @@ export default function DebtTools(){
  const [scope,setScope]=useState("unknown"),[contractDate,setContractDate]=useState("2026-11-07");
  const changeOffer=(i:number,k:keyof Offer,v:string)=>setOffers(xs=>xs.map((x,j)=>i===j?{...x,[k]:v}:x));
  const changeDebt=(i:number,k:keyof Debt,v:string)=>setDebts(xs=>xs.map((x,j)=>i===j?{...x,[k]:v}:x));
- const result=useMemo(()=>{
+ const result:any=useMemo(()=>{
   try{
    const o=offers.map(x=>({id:x.id,principalCents:cents(x.principal),nominalAnnualPct:pcent(x.rate),months:months(x.months),openingFeeCents:cents(x.opening),monthlyFeeCents:cents(x.fee)}));
    const d=debts.map(x=>({id:x.id,balanceCents:cents(x.balance),nominalAnnualPct:pcent(x.rate),minPaymentCents:cents(x.minimum),monthlyFeeCents:cents(x.fee)}));
-   const offersCompared=compareOffers(o).map((x:any)=>({...x,capCheck:preliminaryCapCheck({...o.find(y=>y.id===x.id),inScope:scope==="unknown"?null:scope==="yes",contractDate})}));
+   const capCheck:any=preliminaryCapCheck;
+   const offersCompared=compareOffers(o).map((x:any)=>({...x,capCheck:capCheck({...o.find(y=>y.id===x.id),inScope:scope==="unknown"?null:scope==="yes",contractDate})}));
    const monthlyBudget=cents(budget),settlementFees=cents(payoffFees);
    const strategies=compareStrategies(d,monthlyBudget);
    const allPrincipal=d.reduce((s,x)=>s+x.balanceCents,0)+settlementFees;
