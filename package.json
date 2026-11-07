@@ -22,7 +22,8 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "@playwright/test": "^1.56.0"
+    "@playwright/test": "^1.56.0",
+    "@types/pg": "^8.15.5"
   },
   "overrides": {
     "next": {
