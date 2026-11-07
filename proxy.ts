@@ -1,10 +1,10 @@
-import { type NextRequest, type NextFetchEvent } from "next/server";
+import { type NextRequest } from "next/server";
 import { auth } from "./lib/auth/server";
 
 /** Next.js 16: one proxy composes Neon Auth and per-request CSP. */
 const authProxy = auth.middleware({ loginUrl: "/auth/sign-in" });
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default async function proxy(request: NextRequest) {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
   const nonce = btoa(String.fromCharCode(...bytes));
   const csp = [
@@ -22,7 +22,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   ].join("; ");
   request.headers.set("x-nonce", nonce);
   request.headers.set("Content-Security-Policy", csp);
-  const response = await authProxy(request, event);
+  const response = await authProxy(request);
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Cache-Control", "no-store, max-age=0");
   return response;
