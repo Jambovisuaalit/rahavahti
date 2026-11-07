@@ -9,9 +9,6 @@ const securityHeaders = [
   { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
   { key: 'Cache-Control', value: 'no-store, max-age=0' },
   { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
-  // Static App Router pages emit inline hydration scripts; enforce strict resource
-  // directives only after a tested nonce/hash solution is in place.
-  { key: 'Content-Security-Policy-Report-Only', value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'" },
 ];
 const config: NextConfig = {
   poweredByHeader: false,
