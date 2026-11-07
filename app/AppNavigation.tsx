@@ -6,7 +6,7 @@ import { useState } from 'react';
 type NavItem={href:string;label:string;symbol:string;active:(pathname:string)=>boolean};
 const items:NavItem[]=[
  {href:'/',label:'Etusivu',symbol:'⌂',active:p=>p==='/'},
- {href:'/#csv',label:'Budjetti',symbol:'▤',active:()=>false},
+ {href:'/budjetti',label:'Budjetti',symbol:'▤',active:p=>p.startsWith('/budjetti')},
  {href:'/luotonantajat',label:'Luotot',symbol:'▣',active:p=>p.startsWith('/luotonantajat')},
  {href:'/#audit',label:'Ostoauditointi',symbol:'◇',active:()=>false},
 ];
@@ -14,7 +14,7 @@ const items:NavItem[]=[
 export default function AppNavigation(){
  const path=usePathname();
  const [more,setMore]=useState(false);
- const link=(item:NavItem,mode:'sidebar'|'mobile')=><Link
+ const link=(item:NavItem)=><Link
    key={item.label} href={item.href} className={'nav-link '+(item.active(path)?'is-active':'')}
    aria-current={item.active(path)?'page':undefined} onClick={()=>setMore(false)}>
    <span className="nav-symbol" aria-hidden="true">{item.symbol}</span><span>{item.label}</span>
@@ -26,7 +26,7 @@ export default function AppNavigation(){
    <span className="pill">KEHITYSESikatselu · HOLD</span>
   </div>
   <aside className="app-sidebar" aria-label="Päänavigaatio">
-   <nav>{items.map(item=>link(item,'sidebar'))}</nav>
+   <nav>{items.map(item=>link(item))}</nav>
    <div className="side-divider"/>
    <p className="nav-section-title">Myöhemmin</p>
    <span className="nav-disabled" aria-disabled="true">Raportit · HOLD</span>
@@ -34,7 +34,7 @@ export default function AppNavigation(){
    <div className="sidebar-footer">Vain synteettinen testidata<br/>Ei henkilötietojen käsittelyä</div>
   </aside>
   <nav className="app-bottomnav" aria-label="Mobiilinavigaatio">
-   {items.slice(0,3).map(item=>link(item,'mobile'))}
+   {items.slice(0,3).map(item=>link(item))}
    <button type="button" className={'mobile-more '+(more?'is-active':'')} aria-expanded={more} aria-controls="mobile-more-panel" onClick={()=>setMore(v=>!v)}>
     <span className="nav-symbol" aria-hidden="true">☰</span><span>Valikko</span>
    </button>
