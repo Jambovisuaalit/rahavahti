@@ -75,3 +75,23 @@ test('pure loan model has no fetch, storage or remote APIs',async()=>{
  const source=fs.readFileSync(new URL('../lib/loan-costs.mjs',import.meta.url),'utf8');
  assert.doesNotMatch(source,/\bfetch\s*\(|\bXMLHttpRequest\b|\blocalStorage\b|\bsessionStorage\b|\bindexedDB\b/);
 });
+
+test('independent monthly cash-flow reference A: 2000 EUR at 10%, 24 months, no fees',()=>{
+ const x=simulateLoan(base);
+ approx(x.aprPct,10.47103282772374,0.000001);
+ assert.equal(x.totalCostsCents,21495);
+});
+test('independent monthly cash-flow reference B: 2000 EUR at 9%, 25 EUR opening, 3 EUR monthly',()=>{
+ const x=simulateLoan({...base,nominalPct:9,openingEuro:25,monthlyFeeEuro:3});
+ approx(x.aprPct,14.380970325051305,0.000001);
+ assert.equal(x.totalCostsCents,28990);
+});
+test('monthly periods yield same APR when drawdown shifts across leap year',()=>{
+ const a=simulateLoan({...base,startDate:'2026-11-07'});
+ const b=simulateLoan({...base,startDate:'2027-11-07'});
+ approx(a.aprPct,b.aprPct,0.0000001);
+});
+test('2026 H2 screening rejects 2027 contract pending new reference rate',()=>{
+ const future=screen2026CostCap(simulateLoan({...base,startDate:'2027-01-01'}));
+ assert.equal(future.status,'NOT_ASSESSED');
+});
