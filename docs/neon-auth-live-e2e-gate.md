@@ -53,3 +53,16 @@ HTTP-testi vaatii: anonyymilta ei pääsyä `/api/accounts`; molemmilla oikea s�
 - Oikean Neon PostgreSQL:n RLS-testi kahdella synteettisellä tenantilla: **PASS**.
 - Oikean Neon Auth -istunnon / HTTP GET / palvelimen `app.user_id` / PostgreSQL RLS -ketju: **EI VIELÄ VARMENNETTU**.
 - Tuotannon henkilötietojen käsittely, pysyvä tallennus ja PR-merge: **HOLD**.
+
+
+## 07.11.2026 tarkennus: oikeat QA-käyttäjät ja deployment-ennakkotarkistus
+
+- Neon Auth QA-haaraan luotiin kaksi **synteettistä käyttäjää**, joille asetettiin omistajatunnisteeseen sidotut omat `finance.accounts`-tietueet. PostgreSQL:n SELECT- ja vieraan rivin UPDATE-negatiivinen testi: **PASS** molemmille.
+- Neon Authin `credential`-tietueissa `password IS NOT NULL` oli **false** kummallekin, joten niitä ei saa väittää toimiviksi sähköposti-/salasanatunnuksiksi. Salasanan perustaminen on tehtävä tuetun Auth-virran kautta suojatussa testiympäristössä. Älä lisää salasanahasheja suoraan tietokantaan.
+- Vercel `rahavahti-e2e-secure` -projektin ensimmäinen julkaisu `dpl_G8bhnevVthLvZTFVJxEtux25bZkk` palautui Verceliltä kohteella `target=production` ja se **keskeytettiin** (`CANCELED`). Tätä URL:ia ei saa käyttää hyväksyntään.
+- `scripts/verify-neon-auth-live-e2e.mjs` on nyt *fail-closed*: se tarkistaa Vercelin virallisesta deployment-rajapinnasta `target=null` (Preview), `readyState=READY`, oikean eristetyn projektin, URL:n sekä tarkan `GITHUB_SHA`-commitin **ennen kirjautumista**.
+- Suojattuun GitHub Actions `rahavahti-qa` -environmentiin on asetettava myös `RAHAVAHTI_QA_DEPLOYMENT_ID` ja `VERCEL_TOKEN`. Tokenia tai käyttäjien salasanoja ei saa tallentaa keskusteluun, PR-kommentteihin tai tiedostoihin.
+- Vercelin dokumentaatiossa preview on oletusarvo, kun `target` jätetään pois. Tuoreen projektin ensimmäisen deploymentin epätoivottu tuotantoluokittelu on raportoitu myös muualta; **mitään uutta deploymentia ei saa olettaa previewksi** ennen API-metadatan tarkistusta.
+- Live-testin `SUCCESS` edellyttää kahta toimivaa, salasanallista QA-käyttäjää. Testin täydellinen läpäisy on edelleen **AVOIN**.
+
+Vercel-dokumentaatio: https://vercel.com/docs/deployments/environments ja https://github.com/vercel/vercel/issues/17069 .
