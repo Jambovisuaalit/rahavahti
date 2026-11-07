@@ -1,0 +1,30 @@
+name: Rahavahti real Neon Auth E2E (HOLD)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-auth-isolation:
+    runs-on: ubuntu-latest
+    environment: rahavahti-qa
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify configured isolated preview and live two-user sessions
+        env:
+          RAHAVAHTI_QA_BASE_URL: ${{ secrets.RAHAVAHTI_QA_BASE_URL }}
+          RAHAVAHTI_QA_DEPLOYMENT_ID: ${{ secrets.RAHAVAHTI_QA_DEPLOYMENT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          RAHAVAHTI_QA_USER_A_EMAIL: ${{ secrets.RAHAVAHTI_QA_USER_A_EMAIL }}
+          RAHAVAHTI_QA_USER_A_PASSWORD: ${{ secrets.RAHAVAHTI_QA_USER_A_PASSWORD }}
+          RAHAVAHTI_QA_USER_B_EMAIL: ${{ secrets.RAHAVAHTI_QA_USER_B_EMAIL }}
+          RAHAVAHTI_QA_USER_B_PASSWORD: ${{ secrets.RAHAVAHTI_QA_USER_B_PASSWORD }}
+          RAHAVAHTI_QA_USER_A_ACCOUNT_ID: ${{ secrets.RAHAVAHTI_QA_USER_A_ACCOUNT_ID }}
+          RAHAVAHTI_QA_USER_B_ACCOUNT_ID: ${{ secrets.RAHAVAHTI_QA_USER_B_ACCOUNT_ID }}
+        run: node scripts/verify-neon-auth-live-e2e.mjs

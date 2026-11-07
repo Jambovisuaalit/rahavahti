@@ -29,3 +29,14 @@ Tämä lähdekoodi sisältää luotonantajaluettelon ja syntetisoidun CSV-esikat
 
 ## Päätös
 HOLD. Tämä ei ole oikeudellinen lausunto eikä GDPR-vaatimusten täyttymistä osoittava lopullinen hyväksyntä.
+
+
+## Turvallisuuskatselmuksen lisäys 07.11.2026 – päätös edelleen HOLD
+
+**Teknisen testauksen valmistuminen ei ole rekisterinpitäjän hyväksyntä.** Neon Auth -QA-integraatio on käytössä, mutta kahta toimivaa Auth-sessiota yhdistävää HTTP → API → DB -testiä ei ole hyväksytysti suoritettu. Vanha merkintä ”autentikointi ei toteutettu” tarkoittaa, ettei suojattua käyttäjäkohtaista talousdatan käsittelyketjua ole vielä hyväksytty; Auth-komponentti itsessään on jo lisätty.
+
+Tietosuojan hyväksymisvastuu: rekisterinpitäjän nimetty edustaja (puuttuu). Ennen hyväksyntää täytettävä ja todistettava: rekisterinpitäjän identiteetti ja yhteystiedot; kunkin tietoryhmän käyttötarkoitus ja GDPR 6 artiklan peruste; palveluntarjoajien ja alikäsittelijöiden sopimukset; tietojen sijainti ja siirtoperusteet; poistojen ja varmuuskopioiden enimmäisajat; rekisteröidyn tarkastus-, oikaisu-, poisto- ja siirtopyyntöjen prosessit; lokitietojen minimointi; tietoturvaloukkausten menettely; DPIA-tarpeen kirjallinen päätös; todellisen palvelun julkisen ilmoituksen vertailu toteutuneisiin tietovirtoihin.
+
+**Tekninen audit-suojaus:** migraatioehdotus `db/migrations/0003_qa_security_hardening_candidate.sql` on vain lähdekoodissa, ei sovellettu tietokantaan. Roolin UPDATE/DELETE-oikeuksien poisto ei yksin tee audit-lokista muuttumatonta: DBA, taulun omistaja tai BYPASSRLS-rooli voi edelleen muokata tietoja. Todellinen muuttumattomuus edellyttää erillistä append-only-arkkitehtuuria, rajoitettuja ylläpitäjäoikeuksia ja tarvittaessa riippumatonta WORM-/hash-ketjuvarmennusta.
+
+**Hyväksymistila: EI HYVÄKSYTTY.** Henkilötietojen tuonti, pysyvä tallennus ja tuotantoon vienti kielletty.
