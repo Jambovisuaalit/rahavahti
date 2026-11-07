@@ -13,7 +13,7 @@ export default function CreditorsPage(){
   catch(err){setError(err instanceof Error?err.message:'Tuontia ei voitu käsitellä')}
   finally{e.target.value=''}
  }
- return <><header><strong>Rahavahti</strong><span className="pill">KEHITYSESikatselu · HOLD</span></header><main>
+ return <><main>
  <a href="/">← Etusivu</a><h1>Luotonantajat ja omien luottotietojen tuonti</h1>
  <div className="info"><b>HOLD – vain synteettinen testidata.</b> Tiedosto luetaan selaimen muistissa. Tietoja ei lähetetä eikä tallenneta palvelimelle. Älä lataa aitoja henkilökohtaisia luottotietoja. Viralliseen luottotietorekisteriin ei ole yhteyttä.</div>
  <div className="grid" style={{marginTop:24}}>
@@ -29,5 +29,5 @@ export default function CreditorsPage(){
  <div className="tablewrap"><table><thead><tr><th>Luotonantaja</th><th>Tyyppi</th><th>Saldo</th></tr></thead><tbody>{preview.rows.slice(0,20).map(x=><tr key={x.line}><td>{x.creditor}</td><td>{x.type}</td><td>{(x.balanceCents/100).toLocaleString('fi-FI',{style:'currency',currency:'EUR'})}</td></tr>)}</tbody></table></div>
  <button disabled>Tallenna luottotiedot (HOLD)</button></>}
  <p className="muted">Esikatselu ei ole automaattinen rekisteritietojen tulkinta eikä luottopäätös. Maksukykyanalyysi lisätään vasta testauksen jälkeen.</p>
- </section></div></main><footer>Rahavahti · Luottotietoesikatselu · Ei tuotantoon</footer></>;
+ </section></div></main></>;
 }
