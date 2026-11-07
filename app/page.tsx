@@ -1,5 +1,7 @@
 'use client';
 import {useMemo,useState,type ChangeEvent} from 'react';
+import Link from 'next/link';
+import {DEMO_TRANSACTIONS,DEMO_LIMITS,budgetSummary,euro as demoEuro,fiDate} from '../lib/demo-budget';
 // @ts-ignore -- JS reference core is covered by node tests.
 import {parseCSV,validateMappedRows,euroCents,purchaseAudit} from '../lib/talous-core.mjs';
 type ValidRow={sourceLine:number;bookedOn:string;monthKey:string;amountCents:number;description:string};
@@ -26,8 +28,31 @@ export default function Home(){
    return purchaseAudit({balanceCents:b,bufferCents:buf,horizonStart:start,horizonDays:30,flows:[{date:day(5),cents:i},{date:day(10),cents:-ex}],purchaseFlows:[{date:start,cents:-p}]});
   }catch(err){return {tier:'EI_ARVIOITAVISSA',reason:txt(err)}}
  },[balance,buffer,price,income,expense,start]);
+ const overview=budgetSummary(DEMO_TRANSACTIONS,DEMO_LIMITS);
  return <><main id="main-content">
-  <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><p><a href="/luotonantajat">Luotonantajahakemisto ja luottotietojen testituonti →</a></p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
+  <div className="page-eyebrow">OMA TALOUS / KEHITYSESikatselu</div>
+  <div className="page-heading"><div><h1>Talouden yleiskuva</h1><p className="muted">Marraskuu 2026 · kuvitteellinen esimerkkitalous</p></div><span className="demo-tag">DEMO · HOLD</span></div>
+  <section aria-label="Talouden tunnusluvut" className="metric-grid">
+    <div className="metric"><span>Tulot</span><strong>{demoEuro(overview.incomeCents)}</strong><small>Esimerkkikuukausi</small></div>
+    <div className="metric"><span>Menot</span><strong>{demoEuro(overview.spentCents)}</strong><small>Esimerkkikuukausi</small></div>
+    <div className="metric"><span>Netto</span><strong>{demoEuro(overview.netCents)}</strong><small>Esimerkkikuukausi</small></div>
+    <div className="metric"><span>Velkasaldo</span><strong>— €</strong><small>Ei tietoja; luottoanalyysi HOLD</small></div>
+  </section>
+  <div className="grid overview-grid">
+    <section className="card"><div className="section-heading"><h2>Budjetin tilanne</h2><Link href="/budjetti">Avaa budjetti</Link></div>
+    {overview.categories.map(c=><div className="budget-category" key={c.category}>
+      <div className="category-line"><b>{c.category}</b><span>{demoEuro(c.spentCents)} / {demoEuro(c.limitCents)}</span></div>
+      <div className="progress-track" role="progressbar" aria-label={c.category+' budjetin käyttö'} aria-valuenow={Math.min(100,c.usedPct??0)} aria-valuemin={0} aria-valuemax={100}><span className={'progress-fill '+(c.remainingCents<0?'over':'')} style={{width:Math.min(100,c.usedPct??0)+'%'}} /></div>
+    </div>)}
+    </section>
+    <section className="card"><div className="section-heading"><h2>Viimeisimmät tapahtumat</h2><Link href="/budjetti">Kaikki tapahtumat</Link></div>
+      <div className="transaction-list">{DEMO_TRANSACTIONS.slice(-4).reverse().map(t=><div className="transaction-row" key={t.id}>
+        <div><b>{t.description}</b><small>{fiDate(t.date)} · {t.category}</small></div><strong>{demoEuro(t.amountCents)}</strong>
+      </div>)}</div>
+    </section>
+  </div>
+  <div className="section-heading" style={{marginTop:28}}><h2>Työkalut</h2><Link href="/luotonantajat">Luotonantajahakemisto</Link></div>
+  <p className="muted">Alla olevat CSV- ja ostoauditointityökalut ovat erillisiä paikallisia testiesikatseluja. Ne eivät päivitä yllä näkyvää esimerkkibudjettia.</p>
   <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
   <div className="grid" style={{marginTop:24}}>
   <section id="csv" className="card"><h2>1. CSV-tuonnin esikatselu</h2><label htmlFor="csv">Valitse testitiedosto (CSV, enintään 10 Mt)</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" onChange={importFile}/>
