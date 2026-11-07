@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
  const client=await db.connect();
  try {
    await client.query("BEGIN");
+   await client.query("SELECT set_config('app.user_id', $1, true)",[userId]);
    // Prevent simultaneous imports for the same user/account combination.
    await client.query("SELECT pg_advisory_xact_lock(hashtext($1),hashtext($2))",[userId,body.accountId]);
    const account=await client.query("SELECT id FROM finance.accounts WHERE id=$1 AND user_id=$2 FOR UPDATE",[body.accountId,userId]);
