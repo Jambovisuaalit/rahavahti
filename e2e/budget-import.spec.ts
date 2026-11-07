@@ -8,7 +8,7 @@ test('synthetic export maps and updates monthly budget without network or persis
  await expect(page.getByText('2 hyväksyttyä')).toBeVisible();
  await page.getByRole('button',{name:'Käytä testitapahtumia budjetissa'}).click();
  await expect(page.getByText('CSV-testitapahtumat käytössä.',{exact:false})).toBeVisible();
- await expect(page.getByText('DEMO-OSTOS-A')).toBeVisible();
+ await expect(page.getByRole('cell',{name:'DEMO-OSTOS-A'}).last()).toBeVisible();
  await expect(page.getByText('Luokittelemattomia menoja: 1',{exact:false})).toBeVisible();
  await page.getByRole('combobox',{name:'Kategoria: DEMO-OSTOS-A'}).selectOption('Ruoka');
  await expect(page.getByText('Luokittelemattomia menoja: 0',{exact:false})).toBeVisible();
