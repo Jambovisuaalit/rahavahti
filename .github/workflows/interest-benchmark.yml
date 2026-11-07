@@ -1,0 +1,21 @@
+name: Public interest benchmark unit checks
+on:
+  pull_request:
+    paths:
+      - "lib/market/interest-benchmark.mjs"
+      - "tests/interest-benchmark.test.mjs"
+      - ".github/workflows/interest-benchmark.yml"
+  push:
+    branches:
+      - "feat/public-interest-benchmark-20261107"
+jobs:
+  benchmark-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test tests/interest-benchmark.test.mjs
