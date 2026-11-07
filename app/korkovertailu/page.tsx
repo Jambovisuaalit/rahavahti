@@ -8,7 +8,7 @@ export default function KorkovertailuPage() {
   const [rate, setRate] = useState("15");
   const [metric, setMetric] = useState<Metric>("nominal");
   const [balance, setBalance] = useState("3000");
-  const [benchmarks,setBenchmarks] = useState(BENCHMARKS);
+  const [benchmarks,setBenchmarks] = useState<Record<string,{id:string;label:string;metric:string;debtType:string;annualRatePercent:number;observationMonth:string;source:string;sourceUrl:string;status:string}>>(BENCHMARKS);
   const [sourceStatus,setSourceStatus] = useState("Haetaan julkista korkoaineistoa…");
   useEffect(()=>{
     const controller=new AbortController();
