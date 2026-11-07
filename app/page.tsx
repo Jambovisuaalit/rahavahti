@@ -51,7 +51,7 @@ export default function Home(){
       </div>)}</div>
     </section>
   </div>
-  <div className="section-heading" style={{marginTop:28}}><h2>Työkalut</h2><Link href="/luotonantajat">Luotonantajahakemisto</Link></div>
+  <div className="section-heading" style={{marginTop:28}}><h2>Työkalut</h2><span><Link href="/luotonantajat">Luotonantajahakemisto</Link> · <Link href="/korkolaskuri">Korkolaskuri</Link></span></div>
   <p className="muted">Alla olevat CSV- ja ostoauditointityökalut ovat erillisiä paikallisia testiesikatseluja. Ne eivät päivitä yllä näkyvää esimerkkibudjettia.</p>
   <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
   <div className="grid" style={{marginTop:24}}>
