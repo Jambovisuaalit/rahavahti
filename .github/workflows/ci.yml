@@ -23,3 +23,7 @@ jobs:
         run: npm test
       - name: Production build validation (not deployment)
         run: npm run build
+      - name: Install headless Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser security E2E (synthetic data only)
+        run: npm run test:e2e
