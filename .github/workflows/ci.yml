@@ -17,6 +17,8 @@ jobs:
           cache-dependency-path: package.json
       - name: Install
         run: npm install --no-audit --no-fund
+      - name: Audit production dependency vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
       - name: Test reference core
         run: npm test
       - name: Production build validation (not deployment)
