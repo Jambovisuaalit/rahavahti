@@ -1,7 +1,7 @@
 name: Rahavahti CI
 on:
   push:
-    branches: [main]
+    branches: [main, feat/creditor-directory-local-import]
   pull_request:
 permissions:
   contents: read
