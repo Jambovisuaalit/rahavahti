@@ -2,7 +2,10 @@ import { type NextRequest } from "next/server";
 import { auth } from "./lib/auth/server";
 
 /** Next.js 16: one proxy composes Neon Auth and per-request CSP. */
-const authProxy = auth.middleware({ loginUrl: "/auth/sign-in" });
+const authProxy = auth.middleware({
+  loginUrl: "/auth/sign-in",
+  publicRoutes: ["/", "/luotonantajat", "/korkovertailu", "/inflaatio", "/api/public-data"],
+});
 
 export default async function proxy(request: NextRequest) {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
