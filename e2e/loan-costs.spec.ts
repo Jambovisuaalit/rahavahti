@@ -12,14 +12,14 @@ test('synthetic model computes APR, nominal cap and fee separately',async({page}
  await page.goto('/korkolaskuri');
  const a=page.getByRole('region',{name:'Vaihtoehto A (demo)'});
  await expect(a.getByText('Arvioitu todellinen vuosikorko')).toBeVisible();
- await expect(a.getByText('Korkokatto: Rajan sisällä')).toBeVisible();
+ await expect(a.getByText('Alkujakson korkokatto: Rajan sisällä')).toBeVisible();
  await page.locator('#nominal-a').fill('18');
- await expect(a.getByText('Korkokatto: Raja ylittyy')).toBeVisible();
+ await expect(a.getByText('Alkujakson korkokatto: Raja ylittyy')).toBeVisible();
  await page.locator('#nominal-a').fill('10');
  await page.locator('#opening-a').fill('120');
  await page.locator('#monthly-a').fill('10');
  await expect(a.getByText('Muut luottokustannukset: Raja ylittyy')).toBeVisible();
- await expect(a.getByText('Korkokatto: Rajan sisällä')).toBeVisible();
+ await expect(a.getByText('Alkujakson korkokatto: Rajan sisällä')).toBeVisible();
 });
 test('APR comparison changes when opening and account fees change',async({page})=>{
  await page.goto('/korkolaskuri');
@@ -35,7 +35,7 @@ test('special loan / old agreement disables legal verdict',async({page})=>{
  await page.goto('/korkolaskuri');
  await page.getByRole('checkbox',{name:/Tarkasteltava sopimus on vanha/}).check();
  const a=page.getByRole('region',{name:'Vaihtoehto A (demo)'});
- await expect(a.getByText('Korkokatto: Ei arvioitu')).toBeVisible();
+ await expect(a.getByText('Alkujakson korkokatto: Ei arvioitu')).toBeVisible();
  await expect(a.getByText('Muut luottokustannukset: Ei arvioitu')).toBeVisible();
 });
 test('navigation opens loan calculator without handling real data',async({page})=>{
@@ -45,4 +45,10 @@ test('navigation opens loan calculator without handling real data',async({page})
  await page.getByRole('navigation',{name:'Lisävalinnat'}).getByRole('link',{name:'Korkolaskuri'}).click();
  await expect(page).toHaveURL(/\/korkolaskuri$/);
  await expect(page.getByText('HOLD – ei oikeita taloustietoja.',{exact:false})).toBeVisible();
+});
+
+test('loan continuing past 2026 requires review of future interest cap',async({page})=>{
+ await page.goto('/korkolaskuri');
+ const a=page.getByRole('region',{name:'Vaihtoehto A (demo)'});
+ await expect(a.getByText('Jatkokauden korkokatto: TARKISTETTAVA')).toBeVisible();
 });
