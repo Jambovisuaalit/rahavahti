@@ -95,3 +95,15 @@ test('2026 H2 screening rejects 2027 contract pending new reference rate',()=>{
  const future=screen2026CostCap(simulateLoan({...base,startDate:'2027-01-01'}));
  assert.equal(future.status,'NOT_ASSESSED');
 });
+
+test('multi-year fixed-rate example does not claim complete cap compliance',()=>{
+ const outcome=screen2026CostCap(simulateLoan(base));
+ assert.equal(outcome.crossesReferencePeriod,true);
+ assert.equal(outcome.status,'REVIEW_REQUIRED');
+ assert.equal(outcome.rateStatus,'PASS');
+});
+test('short contract inside 2026 H2 can pass preliminary cap screening',()=>{
+ const outcome=screen2026CostCap(simulateLoan({...base,months:1,nominalPct:10,openingEuro:0,monthlyFeeEuro:0}));
+ assert.equal(outcome.crossesReferencePeriod,false);
+ assert.equal(outcome.status,'PRELIMINARY_PASS');
+});
