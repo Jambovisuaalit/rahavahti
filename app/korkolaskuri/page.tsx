@@ -77,7 +77,7 @@ export default function LoanComparisonPage(){
    <h2>Tarjousten vertailu</h2>
    {ranked.length===2?<div className="loan-comparison">
     <p>Alhaisempi arvioitu todellinen vuosikorko: <b>{offers[ranked[0].originalIndex].label}</b>.</p>
-    <p>APR-ero: <b>{percent(Math.abs(ranked[1].aprPct-ranked[0].aprPct))} prosenttiyksikköä vastaava lukuarvo</b>. Kulujen absoluuttinen vertailu on mielekäs vain samalla lainapääomalla ja laina-ajalla.</p>
+    <p>Todellisten vuosikorkojen ero: <b>{new Intl.NumberFormat('fi-FI',{maximumFractionDigits:2,minimumFractionDigits:2}).format(Math.abs(ranked[1].aprPct-ranked[0].aprPct))} prosenttiyksikköä</b>. Kulujen absoluuttinen vertailu on mielekäs vain samalla lainapääomalla ja laina-ajalla.</p>
     {offers[0].amountEuro!==offers[1].amountEuro||offers[0].months!==offers[1].months?<p className="info">Tarjouksilla on eri pääoma tai laina-aika. Kokonaiskulujen eurovertailu ei kerro yksin edullisuudesta.</p>:<p>Kokonaiskulujen ero: <b>{money(Math.abs(ranked[1].totalCostsCents-ranked[0].totalCostsCents))}</b>.</p>}
    </div>:<p className="muted">Täytä molemmat tarjoukset kelvollisilla synteettisillä arvoilla.</p>}
    <button type="button" onClick={reset}>Palauta synteettiset esimerkit</button>
