@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from './lib/auth/server';
 
 // Next.js 16 permits one proxy entrypoint. Preserve Neon's session and cookie
@@ -7,7 +7,13 @@ import { auth } from './lib/auth/server';
 const authProxy = auth.middleware({ loginUrl: '/auth/sign-in' });
 
 export default async function proxy(request: NextRequest) {
-  const result = await authProxy(request);
+  // Public pages show only in-memory synthetic financial examples. Keep all
+  // dashboard and account endpoints behind the Neon session layer.
+  const publicPreviewRoutes = new Set(['/', '/budjetti', '/luotonantajat', '/korkolaskuri', '/velkasuunnitelma']);
+  const publicApiRoutes = new Set(['/api/private/credit-records']);
+  const path = request.nextUrl.pathname.replace(/\/$/, '') || '/';
+  const publicPreview = publicPreviewRoutes.has(path) || publicApiRoutes.has(path);
+  const result = publicPreview ? NextResponse.next() : await authProxy(request);
   const bytes = crypto.getRandomValues(new Uint8Array(16));
   const nonce = btoa(String.fromCharCode(...bytes));
   const csp = [
