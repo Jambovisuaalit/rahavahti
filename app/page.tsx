@@ -11,6 +11,7 @@ export default function Home(){
  const [cols,setCols]=useState({date:0,amount:1,description:2});
  const [balance,setBalance]=useState('850,00'),[buffer,setBuffer]=useState('150,00'),[price,setPrice]=useState('299,00'),[income,setIncome]=useState('1200,00'),[expense,setExpense]=useState('1100,00');
  const [start,setStart]=useState('2026-11-07');
+ const [debtMinimums,setDebtMinimums]=useState('0,00');
  const mapped=useMemo<{valid:ValidRow[];invalid:BadRow[]}>(()=>parsed?validateMappedRows(parsed,cols):{valid:[],invalid:[]},[parsed,cols]);
  async function importFile(e:ChangeEvent<HTMLInputElement>){
   setError('');setParsed(null);const f=e.target.files?.[0];if(!f)return;setFilename(f.name);
@@ -19,16 +20,16 @@ export default function Home(){
  }
  const audit=useMemo(()=>{
   try{
-   const b=euroCents(balance),p=euroCents(price),i=euroCents(income),ex=euroCents(expense),buf=euroCents(buffer);
-   if([b,p,i,ex,buf].some(v=>v<0))throw Error('Syötteet eivät voi olla negatiivisia');
+   const b=euroCents(balance),p=euroCents(price),i=euroCents(income),ex=euroCents(expense),buf=euroCents(buffer),debt=euroCents(debtMinimums);
+   if([b,p,i,ex,buf,debt].some(v=>v<0))throw Error('Syötteet eivät voi olla negatiivisia');
    const d=new Date(start+'T00:00:00Z');if(Number.isNaN(d.getTime()))throw Error('Päiväys virheellinen');
    const day=(n:number)=>{const x=new Date(d);x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
-   return purchaseAudit({balanceCents:b,bufferCents:buf,horizonStart:start,horizonDays:30,flows:[{date:day(5),cents:i},{date:day(10),cents:-ex}],purchaseFlows:[{date:start,cents:-p}]});
+   return purchaseAudit({balanceCents:b,bufferCents:buf,horizonStart:start,horizonDays:30,flows:[{date:day(5),cents:i},{date:day(10),cents:-ex},{date:day(12),cents:-debt}],purchaseFlows:[{date:start,cents:-p}]});
   }catch(err){return {tier:'EI_ARVIOITAVISSA',reason:txt(err)}}
- },[balance,buffer,price,income,expense,start]);
+ },[balance,buffer,price,income,expense,debtMinimums,start]);
  return <><header><strong>Rahavahti</strong><span className="pill">KEHITYSESikatselu · HOLD</span></header><main>
   <p className="muted">Itsenäinen suomalainen taloudenhallinnan prototyyppi</p><h1>Ymmärrä taloutesi ennen ostopäätöstä.</h1>
-  <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Kirjautuminen ja Supabase-tietokantatallennus eivät ole käytössä.</div>
+  <div className="info"><b>Ei tuotantokäyttöön.</b> CSV käsitellään ainoastaan selaimen muistissa. Tietoja ei tallenneta eikä lähetetä palvelimelle. Käytä vain kuvitteellista tai anonymisoitua testidataa. Velkojen minimierät lisätään vain tämän kuvitteellisen esimerkin kassavirtaan. Tallentavaa Neon-CSV-tuontia ei tässä näkymässä käytetä.</div>
   <div className="grid" style={{marginTop:24}}>
   <section className="card"><h2>1. CSV-tuonnin esikatselu</h2><label htmlFor="csv">Valitse testitiedosto (CSV, enintään 10 Mt)</label><input id="csv" type="file" accept=".csv,text/csv,text/plain" onChange={importFile}/>
   {filename&&<p className="muted">{filename}</p>}{error&&<p role="alert" className="error">{error}</p>}
@@ -40,9 +41,9 @@ export default function Home(){
     <button disabled>Tallenna tapahtumat (HOLD)</button><p className="muted">Tallennus avataan vasta G1/G2-turvatestien jälkeen.</p>
   </>}</section>
   <section className="card"><h2>2. Ostoauditointi</h2><p className="muted">Viitelaskenta. Syötä vain kuvitteellisia summia.</p><div className="fields">
-    {([{id:'balance',name:'Alkusaldo (€)',value:balance,set:setBalance},{id:'price',name:'Ostoksen hinta (€)',value:price,set:setPrice},{id:'income',name:'Tulot 5 päivän päästä (€)',value:income,set:setIncome},{id:'expense',name:'Menot 10 päivän päästä (€)',value:expense,set:setExpense},{id:'buffer',name:'Turvapuskuri (€)',value:buffer,set:setBuffer}] as const).map(f=><div key={f.id}><label htmlFor={f.id}>{f.name}</label><input id={f.id} value={f.value} onChange={e=>f.set(e.target.value)}/></div>)}
+    {([{id:'balance',name:'Alkusaldo (€)',value:balance,set:setBalance},{id:'price',name:'Ostoksen hinta (€)',value:price,set:setPrice},{id:'income',name:'Tulot 5 päivän päästä (€)',value:income,set:setIncome},{id:'expense',name:'Muut menot 10 päivän päästä (€)',value:expense,set:setExpense},{id:'debt',name:'Velkojen erät 12 päivän päästä (€)',value:debtMinimums,set:setDebtMinimums},{id:'buffer',name:'Turvapuskuri (€)',value:buffer,set:setBuffer}] as const).map(f=><div key={f.id}><label htmlFor={f.id}>{f.name}</label><input id={f.id} value={f.value} onChange={e=>f.set(e.target.value)}/></div>)}
     <div><label htmlFor="start">Aloituspäivä</label><input id="start" type="date" value={start} onChange={e=>setStart(e.target.value)}/></div>
-  </div><div className="summary"><span className="muted">30 päivän pienin ennustettu saldo</span><div className="stat">{audit.tier==='EI_ARVIOITAVISSA'?'Ei arvioitavissa':euro(audit.minProjectedBalanceCents)}</div><b>{audit.tier.replaceAll('_',' ')}</b>{audit.reason&&<p>{audit.reason}</p>}</div></section>
+  </div><div className="summary"><span className="muted">30 päivän pienin ennustettu saldo</span><div className="stat">{audit.tier==='EI_ARVIOITAVISSA'?'Ei arvioitavissa':euro(audit.minProjectedBalanceCents)}</div><b>{audit.tier.replaceAll('_',' ')}</b>{audit.reason&&<p>{audit.reason}</p>}<p><a href="/dashboard/velat">Avaa Velat-moduuli: tarjoukset, maksujärjestys ja yhdistely</a></p><p className="muted">Älä laske velkaeriä kahdesti muiden menojen joukossa.</p></div></section>
   </div><section className="card" style={{marginTop:24}}><h2>Julkaisuportit</h2><p>G0 Määrittely · G1 Auth/RLS <b>HOLD</b> · G2 Tallentava CSV <b>HOLD</b> · G3 Laskentatestaus <b>KESKEN</b> · G4 Viranomaisdata <b>HOLD</b> · G5 Tuotanto <b>HOLD</b></p></section>
  </main><footer>Rahavahti · EUR · fi-FI · Kehityskäyttö</footer></>;
 }
