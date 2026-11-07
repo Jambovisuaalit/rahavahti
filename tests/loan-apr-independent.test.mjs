@@ -4,10 +4,10 @@ import {simulateLoan} from '../lib/loan-costs.mjs';
 
 // Independent implementation: Newton-Raphson on log(1+X), instead of production
 // bisection. Uses independently built discounted receipts to check the residual.
-function independentApr(cashFlows, netProceedsCents, startDate){
- const start=Date.parse(startDate+'T00:00:00Z');
+function independentApr(cashFlows, netProceedsCents){
+ // Decree 1123/2016 Annex I: 12 equal-length months; separate from date displays.
  const terms=cashFlows.map(p=>({amount:p.totalCents,
-  years:(Date.parse(p.date+'T00:00:00Z')-start)/(365*86400000)}));
+  years:p.index/12}));
  let logFactor=Math.log(1.1);
  for(let i=0;i<80;i++){
   let f=-netProceedsCents,derivative=0;
@@ -32,16 +32,15 @@ test('independent Newton solver matches bisection APR within 0.00001 percentage 
   {...sample,startDate:'2028-02-29',months:36,openingEuro:7.5,monthlyFeeEuro:1}
  ]){
   const got=simulateLoan(scenario);
-  const expected=independentApr(got.payments,got.netProceedsCents,got.startDate);
+  const expected=independentApr(got.payments,got.netProceedsCents);
   assert.ok(Math.abs(got.aprPct-expected)<0.00001,
    'APR differs: '+got.aprPct+' vs independent '+expected+' for '+JSON.stringify(scenario));
  }
 });
 test('every modelled APR zeroes independent discounted cash-flow balance',()=>{
  const result=simulateLoan({...sample,nominalPct:12,openingEuro:15,monthlyFeeEuro:4});
- const start=Date.parse(result.startDate+'T00:00:00Z');
  const balance=result.payments.reduce((acc,p)=>{
-  const years=(Date.parse(p.date+'T00:00:00Z')-start)/86400000/365;
+  const years=p.index/12;
   return acc+p.totalCents/Math.pow(1+result.aprPct/100,years);
  },-result.netProceedsCents);
  assert.ok(Math.abs(balance)<0.0001,'cash flows do not net to zero: '+balance);
@@ -55,6 +54,6 @@ test('no-fee APR reasonably approximates equal-month analytic effective annual i
  const input={...sample,months:annual,nominalPct:12,startDate:'2026-11-07'};
  const actual=simulateLoan(input).aprPct;
  const ideal=(Math.pow(1+input.nominalPct/1200,12)-1)*100;
- // Actual-day fractions and rounding generate small differences.
+ // Monthly instalments match the decree's 12 equal months convention; rounding can shift cents.
  assert.ok(Math.abs(actual-ideal)<0.05,actual+' vs '+ideal);
 });
