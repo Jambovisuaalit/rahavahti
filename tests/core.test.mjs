@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {euroCents,finnishDate,parseCSV,validateMappedRows,purchaseAudit} from '../lib/talous-core.mjs';
+test('Suomalainen euro',()=>assert.equal(euroCents('1 234,56'),123456));
+test('Negatiivinen euro',()=>assert.equal(euroCents('-12,34'),-1234));
+test('USA-muotoinen tuhaterotin',()=>assert.equal(euroCents('1,234.56'),123456));
+test('Epäselvä summa estetään',()=>assert.throws(()=>euroCents('1.234')));
+test('Karkauspäivä kelpaa',()=>assert.equal(finnishDate('29.02.2024'),'2024-02-29'));
+test('Virheellinen karkauspäivä estetään',()=>assert.throws(()=>finnishDate('29.02.2025')));
+test('CSV lainatut erottimet',()=>assert.deepEqual(parseCSV('Päivä;Summa;Kuvaus\n01.11.2026;-2,50;"Kauppa; Helsinki"').rows[1],['01.11.2026','-2,50','Kauppa; Helsinki']));
+test('CSV lainatut rivinvaihdot',()=>assert.equal(parseCSV('A;B\n"eka\nrivi";2').rows[1][0],'eka\nrivi'));
+test('CSV sarakekartoitus',()=>{const a=validateMappedRows(parseCSV('Päivä;Summa;Kuvaus\n01.11.2026;-2,50;Kahvi'),{date:0,amount:1,description:2});assert.equal(a.valid[0].amountCents,-250);assert.equal(a.invalid.length,0)});
+test('Tuntematon alkusaldo ei kelpaa',()=>assert.equal(purchaseAudit({balanceCents:null,bufferCents:0,horizonStart:'2026-11-07',horizonDays:30,flows:[],purchaseFlows:[]}).tier,'EI_ARVIOITAVISSA'));
+test('Negatiivinen kassavirta on korkea riski',()=>assert.equal(purchaseAudit({balanceCents:1000,bufferCents:100,horizonStart:'2026-11-07',horizonDays:30,flows:[],purchaseFlows:[{date:'2026-11-07',cents:-2000}]}).tier,'KORKEA_RISKI'));
+test('Turvapuskurin alitus varoittaa',()=>assert.equal(purchaseAudit({balanceCents:1000,bufferCents:500,horizonStart:'2026-11-07',horizonDays:30,flows:[],purchaseFlows:[{date:'2026-11-07',cents:-600}]}).tier,'VAROITUS'));
+test('Riittävä saldo',()=>assert.equal(purchaseAudit({balanceCents:2000,bufferCents:500,horizonStart:'2026-11-07',horizonDays:30,flows:[],purchaseFlows:[{date:'2026-11-07',cents:-600}]}).tier,'MAHTUU_SUUNNITELMAAN'));
+test('Kuukauden vaihde',()=>{const a=validateMappedRows(parseCSV('Päivä;Summa;Kuvaus\n30.11.2026;-1;A\n01.12.2026;-1;B'),{date:0,amount:1,description:2});assert.deepEqual(a.valid.map(v=>v.monthKey),['2026-11','2026-12'])});
