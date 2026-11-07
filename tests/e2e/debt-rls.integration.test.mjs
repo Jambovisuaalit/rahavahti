@@ -8,6 +8,7 @@ import pg from "pg";
  * Required: QA_DEBTS_DATABASE_URL, QA_AUTH_USER_A_ID, QA_AUTH_USER_B_ID.
  * Never use a privileged DATABASE_URL here.
  * Transactions deliberately roll back synthetic data after every test.
+ * DB-level owner contexts are NOT Neon Auth session proofs; API E2E tests still required.
  */
 const connectionString = process.env.QA_DEBTS_DATABASE_URL;
 const userA = process.env.QA_AUTH_USER_A_ID;
@@ -34,7 +35,7 @@ async function insertDebt(client, id, ownerId, creditor) {
   );
 }
 
-test("RLS / IDOR / audit: two authenticated identity contexts", async () => {
+test("RLS / IDOR / audit permissions: two simulated owner contexts", async () => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -64,14 +65,11 @@ test("RLS / IDOR / audit: two authenticated identity contexts", async () => {
 
     const updated = await client.query("UPDATE finance.user_debts_v2 SET balance_cents=90000 WHERE id=$1 RETURNING balance_cents",[uid]);
     assert.equal(Number(updated.rows[0].balance_cents),90000);
-    const audited = await client.query(
-      "INSERT INTO finance.debt_audit_events_v2(owner_id,action,debt_id,outcome) VALUES($1,'update',$2,'ok')",
-      [userA,uid]
-    );
-    assert.equal(audited.rowCount,1,"Successful change must create audit record");
     const rights=(await client.query(`
-      SELECT has_table_privilege(current_user,'finance.debt_audit_events_v2','UPDATE') AS can_update,
+      SELECT has_table_privilege(current_user,'finance.debt_audit_events_v2','INSERT') AS can_insert,
+             has_table_privilege(current_user,'finance.debt_audit_events_v2','UPDATE') AS can_update,
              has_table_privilege(current_user,'finance.debt_audit_events_v2','DELETE') AS can_delete`)).rows[0];
+    assert.equal(rights.can_insert,false, 'Audit rows must come from trigger only');
     assert.equal(rights.can_update,false);
     assert.equal(rights.can_delete,false);
 
