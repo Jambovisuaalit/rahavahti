@@ -76,7 +76,7 @@ export default function BudgetPage(){
     <option value="generic">Yleinen CSV (vain synteettinen testi)</option>
     {BANK_EXPORTS.map(bank=><option key={bank.id} value={bank.id}>{bank.name}</option>)}
    </select>
-   {selectedBank!=='generic'&&BANK_EXPORTS.filter(bank=>bank.id===selectedBank).map(bank=><p className="info" key={bank.id}><b>{bank.status}.</b> {bank.note} <a href={bank.source} rel="noreferrer noopener" target="_blank">Pankin lähdeohje</a>. Tämä valinta ei muuta jäsennystä eikä vahvista yhteensopivuutta.</p>}
+   {selectedBank!=='generic'&&BANK_EXPORTS.filter(bank=>bank.id===selectedBank).map(bank=><p className="info" key={bank.id}><b>{bank.status}.</b> {bank.note} <a href={bank.source} rel="noreferrer noopener" target="_blank">Pankin lähdeohje</a>. Tämä valinta ei muuta jäsennystä eikä vahvista yhteensopivuutta.</p>)}
    <label htmlFor="account-scope">Testitilin tunniste (kaksoiskappaleiden tarkistus)</label>
    <input id="account-scope" value={accountScope} onChange={e=>{setAccountScope(e.target.value);setDuplicateReviewed(false);setExcluded([])}} maxLength={60} placeholder="DEMO_ACCOUNT"/>
    <p className="muted">Älä syötä oikeaa IBANia. Käytä vain kuvitteellista tilitunnistetta.</p>
