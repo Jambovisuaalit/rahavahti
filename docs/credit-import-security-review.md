@@ -27,3 +27,18 @@ Kohde: PR #1, `feat/creditor-directory-local-import`. Tarkastus koskee luettuja 
 1. Korjaa SEC-02 ja vahvista skeeman rajaus SEC-03.
 2. Toimita SEC-04/SEC-06 skannaus- ja regressiotulokset.
 3. Säilytä tuotantoon ja oikeaan dataan liittyvät G1/G2/G5-estot riippumatta siitä, aloitetaanko maksukykymallin kehitys vain synteettisellä datalla.
+
+## Korjauskierros 07.11.2026 – CI #10
+
+GitHub Actions ajo 42352900879, commit 641acb69271239620c23d6854c4603048080af19, **success**:
+- `npm install --no-audit --no-fund`: PASS
+- `npm audit --omit=dev --audit-level=high`: PASS; **0 vulnerabilities** npm:n tarkistuksen mukaan.
+- `npm test`: **29/29 PASS**, 0 epäonnistumista.
+- `npm run build`: PASS, 5/5 sivua generoitu.
+- SEC-02: CSV-parseri korjattu tukemaan lainattujen kenttien rivinvaihtoja ja erotinmerkkejä; testattu CI:ssä.
+- SEC-04 (osittain): tuotantoriippuvuuksien auditointi lisätty CI-porttiin; Next.js:n PostCSS-riippuvuus ohitettu versioon 8.5.32.
+- SEC-06 (osittain): lisätty parserin reunatapaus- ja lähdekoodin no-network/persistence-invarianttitestejä.
+
+**Rajoitukset:** no-network-testit ovat lähdekoodin staattisia invarianttitarkistuksia, eivät selaimen todellisen verkkoliikenteen, kaikkien analytiikkaskriptien tai tuotantovasteiden riippumatonta varmennusta. Browser E2E, CSP/HTTP-turvaotsakkeet, todellinen dataeristys, tietosuojaprosessit, synteettisen datan pakottaminen ja virallisen raportin tuontimäppäys ovat edelleen avoimia. Nykyinen `npm install` ei ole lockfileen perustuva deterministinen asennus.
+
+**Päätös:** CI PASS / tuotanto ja oikeiden luottotietojen käsittely edelleen **HOLD**. Maksukyky- ja velka-analyysi ei kuulu tähän korjauskierrokseen.
