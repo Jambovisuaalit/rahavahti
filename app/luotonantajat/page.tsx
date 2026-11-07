@@ -13,7 +13,7 @@ export default function CreditorsPage(){
   catch(err){setError(err instanceof Error?err.message:'Tuontia ei voitu käsitellä')}
   finally{e.target.value=''}
  }
- return <><main>
+ return <><main id="main-content">
  <a href="/">← Etusivu</a><h1>Luotonantajat ja omien luottotietojen tuonti</h1>
  <div className="info"><b>HOLD – vain synteettinen testidata.</b> Tiedosto luetaan selaimen muistissa. Tietoja ei lähetetä eikä tallenneta palvelimelle. Älä lataa aitoja henkilökohtaisia luottotietoja. Viralliseen luottotietorekisteriin ei ole yhteyttä.</div>
  <div className="grid" style={{marginTop:24}}>
