@@ -34,3 +34,15 @@ node --test tests/e2e/debt-rls.integration.test.mjs
 - Kerää virhetilanteet, palaute ja käytettävyyshavainnot. Älä tallenna oikeita velkoja ennen G1–G3 hyväksyntää.
 
 Päätös: HOLD, kunnes kaikki tuotantotallennuksen edellyttämät portit on todistettu.
+
+
+## Tietokantatason todennettu näyttö 7.11.2026
+- Neon: `rahavahti / dev-secure-import`; sovellusrooli `rahavahti_rls_qa` (BYPASSRLS=false).
+- Kummallakin QA-käyttäjällä oma synteettinen velka. A/B molempiin suuntiin: SELECT vieraan velan ID:llä 0 riviä; UPDATE 0; DELETE 0; oman velan UPDATE onnistuu.
+- Anonyymi owner-konteksti: 0 näkyvää velkariviä.
+- `finance.audit_user_debt_change_v2` -triggeri kirjasi onnistuneista omista UPDATE-operaatioista kummallekin oman merkinnän. Merkinnät luettiin eri tietokantayhteydellä transaktioiden valmistuttua (1 kummallekin).
+- QA-roolilta varmistettiin INSERT=false, UPDATE=false, DELETE=false audit-tauluun. Lokimerkinnät syntyvät triggerissä.
+- Nämä testit käyttivät SQL:ssä simuloituja owner-konteksteja, **eivät kahta oikeaa Neon Auth -kirjautumista**. Käyttäjätunnisteen luotettava sidonta API-istuntoon on vielä testattava; `set_config`-arvo yksin ei ole todiste identiteetistä.
+- Audit-triggerin lokituksen toimivuus on näytetty UPDATE:lle. INSERT/DELETE audit-vastaanottotesti, hylkäyslokituksen politiikka, oikean Auth-istunnon API-E2E sekä CI ovat vielä avoinna.
+
+**G1 päätös: HOLD, kunnes oikeilla istunnoilla suoritettu API-E2E ja loput audit-testit läpäistään.**
