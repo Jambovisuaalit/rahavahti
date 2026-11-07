@@ -9,6 +9,7 @@ const items:NavItem[]=[
  {href:'/budjetti',label:'Budjetti',symbol:'▤',active:p=>p.startsWith('/budjetti')},
  {href:'/luotonantajat',label:'Luotot',symbol:'▣',active:p=>p.startsWith('/luotonantajat')},
  {href:'/#audit',label:'Ostoauditointi',symbol:'◇',active:()=>false},
+ {href:'/korkolaskuri',label:'Korkolaskuri',symbol:'%',active:p=>p.startsWith('/korkolaskuri')},
 ];
 
 export default function AppNavigation(){
@@ -41,6 +42,7 @@ export default function AppNavigation(){
   </nav>
   {more&&<div className="mobile-more-panel" id="mobile-more-panel"><nav aria-label="Lisävalinnat">
    <Link href="/#audit" onClick={()=>setMore(false)}>Ostoauditointi</Link>
+   <Link href="/korkolaskuri" onClick={()=>setMore(false)}>Korkolaskuri</Link>
    <span aria-disabled="true">Raportit · HOLD</span>
    <span aria-disabled="true">Asetukset · HOLD</span>
   </nav></div>}
