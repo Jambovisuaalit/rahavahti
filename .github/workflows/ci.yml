@@ -47,4 +47,8 @@ jobs:
       - name: Install headless Chromium
         run: npx playwright install --with-deps chromium
       - name: Browser security E2E (synthetic data only)
+        env:
+          NEON_AUTH_BASE_URL: https://ci.example.invalid/rahavahti/auth
+          NEON_AUTH_COOKIE_SECRET: ci-only-synthetic-secret-never-for-production-0000
+          FINANCE_WRITES_ENABLED: 'false'
         run: npm run test:e2e

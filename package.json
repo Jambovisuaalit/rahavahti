@@ -22,11 +22,22 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "@playwright/test": "^1.56.0"
+    "@playwright/test": "^1.56.0",
+    "@types/pg": "^8.15.5"
   },
   "overrides": {
     "next": {
       "postcss": "8.5.32"
-    }
+    },
+    "better-auth": "1.7.18",
+    "@better-auth/core": "1.7.18",
+    "@better-auth/drizzle-adapter": "1.7.18",
+    "@better-auth/kysely-adapter": "1.7.18",
+    "@better-auth/memory-adapter": "1.7.18",
+    "@better-auth/mongo-adapter": "1.7.18",
+    "@better-auth/prisma-adapter": "1.7.18",
+    "@better-auth/telemetry": "1.7.18",
+    "@better-auth/oauth-provider": "1.7.18",
+    "zod": "4.6.7"
   }
 }
